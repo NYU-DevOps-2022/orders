@@ -29,7 +29,7 @@ class YourResourceModel(db.Model):
     name = db.Column(db.String(63))
 
 
-class YourResourceModel(db.Model):
+class customers(db.Model):
     """
     Class that represents a <your resource model name>
     """
