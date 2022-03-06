@@ -25,16 +25,38 @@ class TestYourResourceModel(unittest.TestCase):
 
     def setUp(self):
         """ This runs before each test """
-        pass
+        self.your_resource_model = YourResourceModel()
 
     def tearDown(self):
         """ This runs after each test """
-        pass
+        self.your_resource_model = None
 
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_XXXX(self):
-        """ Test something """
-        self.assertTrue(True)
+    def test_create(self):
+        """ Test the create method in YourResourceModel.
+        Currently this test only tests the return value of the create method.
+        #TODO(ELF): check that the db has been properly updated 
+        # as a result of this function call."""
+        self.assertIsNone(self.your_resource_model.create())
+
+    # def test_save(self):
+    #     """Test the save method in YourResourceModel."""
+    #     self.assertIsNone(self.yrm.save())
+
+    # def test_delete(self):
+    #     """Test the save method in YourResourceModel."""
+    #     self.assertIsNone(self.yrm.delete())
+
+    def test_serialize(self):
+        self.your_resource_model.id = "12345"
+        self.your_resource_model.name = "Ed"
+        self.assertEqual({"id": "12345", "name": "Ed"}, self.your_resource_model.serialize())
+
+    def test_deserialize(self):
+        self.assertEqual(self.your_resource_model, self.your_resource_model.deserialize({"id": "12345", "name": "Ed"}))
+        self.assertEqual("Ed", self.your_resource_model.name)
+        
+

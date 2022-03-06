@@ -36,7 +36,7 @@ class YourResourceModel(db.Model):
         """
         Creates a YourResourceModel to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info(f"Creating {self.name}")
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
