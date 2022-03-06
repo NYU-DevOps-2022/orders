@@ -17,6 +17,17 @@ class DataValidationError(Exception):
 
     pass
 
+class YourResourceModel(db.Model):
+    """
+    Class that represents a <your resource model name>
+    """
+
+    app = None
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(63))
+
 
 class YourResourceModel(db.Model):
     """
