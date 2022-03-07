@@ -5,6 +5,8 @@ Test cases for YourResourceModel Model
 import logging
 import unittest
 import os
+import flask_sqlalchemy
+from  werkzeug import exceptions
 from service.models import YourResourceModel, DataValidationError, db
 
 ######################################################################
@@ -63,3 +65,26 @@ class TestYourResourceModel(unittest.TestCase):
         self.your_resource_model.init_db=unittest.mock.MagicMock(return_value=None)
         app=unittest.mock.Mock()
         self.assertIsNone(self.your_resource_model.init_db(app))
+
+    def test_all(self):
+        self.your_resource_model.all=unittest.mock.MagicMock(return_value=None)
+        self.assertEqual(None, self.your_resource_model.all())
+
+    def test_find(self):
+        self.your_resource_model.find=unittest.mock.MagicMock(return_value=None)
+        self.assertEqual(None, self.your_resource_model.find())
+
+    def test_find_or_404(self):
+        # self.your_resource_model.find_or_404=unittest.mock.MagicMock(return_value=None)
+        with self.assertRaises(exceptions.NotFound):
+            self.your_resource_model.find_or_404(123) 
+        # self.assertEqual(None, self.your_resource_model.find_or_404(123))
+
+    #TODO: FIX find_by_name
+
+    def test_find_by_name(self):
+        pass
+        # self.your_resource_model.query.filter=unittest.mock.MagicMock(return_value=None)
+        # things=flask_sqlalchemy.BaseQuery()
+        # things.filter=unittest.mock.MagicMock(return_value=None)
+        # self.assertEqual(things, self.your_resource_model.find_by_name("margarita"))
