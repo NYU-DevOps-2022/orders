@@ -58,5 +58,8 @@ class TestYourResourceModel(unittest.TestCase):
     def test_deserialize(self):
         self.assertEqual(self.your_resource_model, self.your_resource_model.deserialize({"id": "12345", "name": "Ed"}))
         self.assertEqual("Ed", self.your_resource_model.name)
-        
-
+    
+    def test_init_db(self):
+        self.your_resource_model.init_db=unittest.mock.MagicMock(return_value=None)
+        app=unittest.mock.Mock()
+        self.assertIsNone(self.your_resource_model.init_db(app))
