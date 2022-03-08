@@ -88,3 +88,4 @@ class TestYourResourceModel(unittest.TestCase):
         # things=flask_sqlalchemy.BaseQuery()
         # things.filter=unittest.mock.MagicMock(return_value=None)
         # self.assertEqual(things, self.your_resource_model.find_by_name("margarita"))
+
