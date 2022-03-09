@@ -4,16 +4,22 @@ My Service
 Describe what your service does here
 """
 
-import os
-import sys
-import logging
-from flask import Flask, jsonify, request, url_for, make_response, abort
-from . import status  # HTTP Status Codes
+"""
+Order Store Service
+Paths:
+------
+GET /orders - Returns a list all of the Orders
+GET /orders/{id} - Returns the Order with a given id number
+POST /orders - creates a new Order record in the database
+PUT /orders/{id} - updates a Order record in the database
+DELETE /orders/{id} - deletes a Order record in the database
+"""
 
-# For this example we'll use SQLAlchemy, a popular ORM that supports a
-# variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import YourResourceModel, DataValidationError, order_detail, order_header
+from flask import jsonify, request, url_for, make_response, abort
+from werkzeug.exceptions import NotFound
+from service.models import Order
+from . import status  # HTTP Status Codes
+from . import app  # Import Flask application
 
 # Import Flask application
 from . import app
@@ -29,7 +35,7 @@ def index():
         jsonify(
             name="Order Demo REST API Service",
             version="1.0",
-            paths=url_for("list_order", _external=True),
+            # paths=url_for("list_order", _external=True),
         ),
         status.HTTP_200_OK,
     )
@@ -42,13 +48,35 @@ def index():
 def init_db():
     """ Initializes the SQLAlchemy app """
     global app
-    YourResourceModel.init_db(app)
+    Order.init_db(app)
+
+
+
+######################################################################
+# GET AN ORDER INFO
+######################################################################
+
+@app.route("/orders/<int:id_order>", methods=["GET"])
+def get_order(id_order):
+    """
+    Get info of an Order
+    This endpoint will return an Order information based the id specified in the path
+    """
+    app.logger.info("Request to get order info with id: %s", id_order)
+    order = Order.find(id_order)
+    
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(id_order))
+
+    app.logger.info("Returning order: %s", order.id)
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 # DELETE AN ORDER
 ######################################################################
 
-@app.route("/pets/<int:id_order>", methods=["DELETE"])
+@app.route("/orders/<int:id_order>", methods=["DELETE"])
 def delete_pets(id_order):
     """
     Delete an Order

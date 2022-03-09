@@ -4,7 +4,6 @@ Models for orders
 All of the models are stored in this module
 """
 import logging
-from asyncio.windows_events import NULL
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -21,94 +20,7 @@ class DataValidationError(Exception):
     pass
 
 
-class customers(db.Model):
-    """
-    Class that represents a <customers>
-    """
-
-    app = None
-
-    # Table Schema
-    id_customer = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.varchar(45), nullable=False)
-
-    def __repr__(self):
-        return f"<customers {self.name!r} id=[{self.id_customer}]>"
-
-    def serialize(self):
-        """ Serializes a customers into a dictionary """
-        return {"id_customer": self.id_customer, "name": self.name}
-
-    def deserialize(self, data: dict):
-        """
-        Deserializes a customers from a dictionary
-
-        Args:
-            data (dict): A dictionary containing the resource data
-        """
-        try:
-            self.name = data["name"]
-            self.id_customer = data["id_customer"]
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid customers: missing " + error.args[0]
-            )
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid customers: body of request contained bad or no data"
-            )
-        return self
-
-
-class products(db.Model):
-    """
-    Class that represents a <products>
-    """
-
-    app = None
-
-    # Table Schema
-    id_product = db.Column(db.Integer, primary_key=True)
-    quantity = db.Column(db.varchar(45), nullable=False)
-    Price = db.Column(db.varchar(45), nullable=False)
-    name = db.Column(db.varchar(45), nullable=False)
-
-    def __repr__(self):
-        return f"<products {self.name!r} id=[{self.id_product}]>"
-
-    def serialize(self):
-        """ Serializes a products into a dictionary """
-        return {
-            "id_product": self.id_product,
-            "quantity": self.quantity,
-            "price": self.Price,
-            "name": self.name,
-        }
-
-    def deserialize(self, data: dict):
-        """
-        Deserializes a products from a dictionary
-
-        Args:
-            data (dict): A dictionary containing the resource data
-        """
-        try:
-            self.name = data["name"]
-            self.id_product = data["id_product"]
-            self.Price = data["price"]
-            self.quantity = data["quantity"]
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid products: missing " + error.args[0]
-            )
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid products: body of request contained bad or no data"
-            )
-        return self
-
-
-class order_header(db.Model):
+class Order(db.Model):
     """
     Class that represents a <your resource model name>
     """
@@ -191,6 +103,7 @@ class order_header(db.Model):
         return cls.query.all()
 
 
+    @classmethod
     def find(cls, by_id):
         """ Finds an order_header by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
@@ -217,10 +130,10 @@ class order_detail(db.Model):
     app = None
 
     # Table Schema
-    order_id = db.Column(db.Integer, nullable=False)
+    order_id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, nullable=False)
-    quantity_order = db.Column(db.Integer, default=NULL)
-    price_order = db.Column(db.DECIMAL(10, 2), default=NULL)
+    quantity_order = db.Column(db.Integer, default=0)
+    price_order = db.Column(db.DECIMAL(10, 2), default=0)
 
     def __repr__(self):
         return f"<order id=[{self.order_id}]>"
