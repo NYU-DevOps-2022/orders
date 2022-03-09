@@ -4,7 +4,7 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
-import os
+# import os
 import sys
 import logging
 from flask import Flask
