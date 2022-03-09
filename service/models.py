@@ -3,9 +3,10 @@ Models for orders
 
 All of the models are stored in this module
 """
-from asyncio.windows_events import NULL
 import logging
+from asyncio.windows_events import NULL
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -18,6 +19,7 @@ class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
     pass
+
 
 class customers(db.Model):
     """
@@ -32,7 +34,7 @@ class customers(db.Model):
 
     def __repr__(self):
         return f"<customers {self.name!r} id=[{self.id_customer}]>"
-    
+
     def serialize(self):
         """ Serializes a customers into a dictionary """
         return {"id_customer": self.id_customer, "name": self.name}
@@ -56,10 +58,7 @@ class customers(db.Model):
                 "Invalid customers: body of request contained bad or no data"
             )
         return self
-    
 
-
-    
 
 class products(db.Model):
     """
@@ -74,17 +73,16 @@ class products(db.Model):
     Price = db.Column(db.varchar(45), nullable=False)
     name = db.Column(db.varchar(45), nullable=False)
 
-
     def __repr__(self):
         return f"<products {self.name!r} id=[{self.id_product}]>"
-    
+
     def serialize(self):
         """ Serializes a products into a dictionary """
         return {
-            "id_product" : self.id_product,
-            "quantity" : self.quantity,
-            "price" : self.Price,
-            "name" : self.name,
+            "id_product": self.id_product,
+            "quantity": self.quantity,
+            "price": self.Price,
+            "name": self.name,
         }
 
     def deserialize(self, data: dict):
@@ -108,8 +106,6 @@ class products(db.Model):
                 "Invalid products: body of request contained bad or no data"
             )
         return self
-    
-
 
 
 class order_header(db.Model):
@@ -121,7 +117,7 @@ class order_header(db.Model):
 
     # Table Schema
     id_order = db.Column(db.Integer, primary_key=True)
-    date_order = db.Column(db.DateTime(),default=datetime.now)
+    date_order = db.Column(db.DateTime(), default=datetime.now)
     id_customer_order = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
@@ -152,9 +148,9 @@ class order_header(db.Model):
     def serialize(self):
         """ Serializes a order_header into a dictionary """
         return {
-            "id_order" : self.id_order,
-            "date_order" : self.date_order,
-            "id_customer_order" : self.id_customer_order
+            "id_order": self.id_order,
+            "date_order": self.date_order,
+            "id_customer_order": self.id_customer_order
         }
 
     def deserialize(self, data):
@@ -258,10 +254,10 @@ class order_detail(db.Model):
     def serialize(self):
         """ Serializes a order_detail into a dictionary """
         return {
-            "order_id" : self.order_id,
-            "product_id" : self.product_id,
-            "quantity_order" : self.quantity_order,
-            "price_order" : self.price_order,
+            "order_id": self.order_id,
+            "product_id": self.product_id,
+            "quantity_order": self.quantity_order,
+            "price_order": self.price_order,
         }
 
     def deserialize(self, data):
@@ -324,5 +320,3 @@ class order_detail(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
-
-
