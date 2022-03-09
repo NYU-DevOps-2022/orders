@@ -132,11 +132,15 @@ class order_header(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
+    def update(self):
         """
-        Updates an order_header to the database
+        Updates a Pet to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %s", self.id_order)
+        if not self.id_order:
+            raise DataValidationError("Update called with empty ID field")
+        if not self.id_customer_order:
+            raise DataValidationError("Update called with empty customer field")
         db.session.commit()
 
     def delete(self):
@@ -234,11 +238,19 @@ class order_detail(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
+    def update(self):
         """
-        Updates an order_detail to the database
+        Updates a Pet to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %s", self.order_id)
+        if not self.order_id:
+            raise DataValidationError("Update called with empty ID field")
+        if not self.quantity_order:
+            raise DataValidationError("Update called with empty quantity field")
+        if not self.product_id:
+            raise DataValidationError("Update called with empty product field")
+        if not self.price_order:
+            raise DataValidationError("Update called with empty price field")
         db.session.commit()
 
     def delete(self):
