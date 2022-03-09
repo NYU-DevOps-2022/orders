@@ -3,9 +3,10 @@ Models for orders
 
 All of the models are stored in this module
 """
-from asyncio.windows_events import NULL
 import logging
+from asyncio.windows_events import NULL
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -15,9 +16,10 @@ db = SQLAlchemy()
 
 
 class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
+    """ Used for a data validation errors when deserializing """
 
     pass
+
 
 class customers(db.Model):
     """
@@ -31,8 +33,8 @@ class customers(db.Model):
     name = db.Column(db.varchar(45), nullable=False)
 
     def __repr__(self):
-        return "<customers %r id=[%s]>" % (self.name, self.id_customer)
-    
+        return f"<customers {self.name!r} id=[{self.id_customer}]>"
+
     def serialize(self):
         """ Serializes a customers into a dictionary """
         return {"id_customer": self.id_customer, "name": self.name}
@@ -56,10 +58,7 @@ class customers(db.Model):
                 "Invalid customers: body of request contained bad or no data"
             )
         return self
-    
 
-
-    
 
 class products(db.Model):
     """
@@ -74,17 +73,16 @@ class products(db.Model):
     Price = db.Column(db.varchar(45), nullable=False)
     name = db.Column(db.varchar(45), nullable=False)
 
-
     def __repr__(self):
-        return "<products %r id=[%s]>" % (self.name, self.id_product)
-    
+        return f"<products {self.name!r} id=[{self.id_product}]>"
+
     def serialize(self):
         """ Serializes a products into a dictionary """
         return {
-            "id_product" : self.id_product,
-            "quantity" : self.quantity,
-            "price" : self.Price,
-            "name" : self.name,
+            "id_product": self.id_product,
+            "quantity": self.quantity,
+            "price": self.Price,
+            "name": self.name,
         }
 
     def deserialize(self, data: dict):
@@ -108,8 +106,6 @@ class products(db.Model):
                 "Invalid products: body of request contained bad or no data"
             )
         return self
-    
-
 
 
 class order_header(db.Model):
@@ -121,11 +117,11 @@ class order_header(db.Model):
 
     # Table Schema
     id_order = db.Column(db.Integer, primary_key=True)
-    date_order = db.Column(db.DateTime(),default=datetime.now)
+    date_order = db.Column(db.DateTime(), default=datetime.now)
     id_customer_order = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return "<order id=[%s]>" % (self.id)
+        return f"<order id=[{self.id}]>"
 
     def create(self):
         """
@@ -138,28 +134,28 @@ class order_header(db.Model):
 
     def save(self):
         """
-        Updates a order_header to the database
+        Updates an order_header to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """ Removes a order_header from the data store """
+        """ Removes an order_header from the data store """
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a order_header into a dictionary """
+        """ Serializes an order_header into a dictionary """
         return {
-            "id_order" : self.id_order,
-            "date_order" : self.date_order,
-            "id_customer_order" : self.id_customer_order
+            "id_order": self.id_order,
+            "date_order": self.date_order,
+            "id_customer_order": self.id_customer_order
         }
 
     def deserialize(self, data):
         """
-        Deserializes a order_header from a dictionary
+        Deserializes an order_header from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -190,21 +186,21 @@ class order_header(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the order_header in the database """
+        """ Returns all of the order_headers in the database """
         logger.info("Processing all order_header")
         return cls.query.all()
 
-    @classmethod
-    def find(cls, id_order):
-        """ Finds a order_header by it's ID """
-        logger.info("Processing lookup for id %s ...", id_order)
-        return cls.query.get(id_order)
+
+    def find(cls, by_id):
+        """ Finds an order_header by its ID """
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
 
     @classmethod
-    def find_or_404(cls, id_order):
-        """ Find a order_header by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", id_order)
-        return cls.query.get_or_404(id_order)
+    def find_or_404(cls, by_id):
+        """ Find an order_header by its id """
+        logger.info("Processing lookup or 404 for id %s ...", by_id)
+        return cls.query.get_or_404(by_id)
 
     @classmethod
     def find_by_customer(cls, id_customer_order):
@@ -227,11 +223,11 @@ class order_detail(db.Model):
     price_order = db.Column(db.DECIMAL(10, 2), default=NULL)
 
     def __repr__(self):
-        return "<order id=[%s]>" % (self.order_id)
+        return f"<order id=[{self.order_id}]>"
 
     def create(self):
         """
-        Creates a order_detail to the database
+        Creates an order_detail to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # id must be none to generate next primary key
@@ -240,29 +236,29 @@ class order_detail(db.Model):
 
     def save(self):
         """
-        Updates a order_detail to the database
+        Updates an order_detail to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """ Removes a order_detail from the data store """
+        """ Removes an order_detail from the data store """
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a order_detail into a dictionary """
+        """ Serializes an order_detail into a dictionary """
         return {
-            "order_id" : self.order_id,
-            "product_id" : self.product_id,
-            "quantity_order" : self.quantity_order,
-            "price_order" : self.price_order,
+            "order_id": self.order_id,
+            "product_id": self.product_id,
+            "quantity_order": self.quantity_order,
+            "price_order": self.price_order,
         }
 
     def deserialize(self, data):
         """
-        Deserializes a order_detail from a dictionary
+        Deserializes an order_detail from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -299,17 +295,24 @@ class order_detail(db.Model):
         logger.info("Processing all order_detail")
         return cls.query.all()
 
-    @classmethod
-    def find(cls, order_id):
-        """ Finds a order_detail by it's ID """
-        logger.info("Processing lookup for id %s ...", order_id)
-        return cls.query.get(order_id)
+
+    def find(cls, by_id):
+        """ Finds an order_detail by its ID """
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
 
     @classmethod
-    def find_or_404(cls, order_id):
-        """ Find a order_detail by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", order_id)
-        return cls.query.get_or_404(order_id)
+    def find_or_404(cls, by_id):
+        """ Find an order_detail by its id """
+        logger.info("Processing lookup or 404 for id %s ...", by_id)
+        return cls.query.get_or_404(by_id)
 
+    @classmethod
+    def find_by_name(cls, name):
+        """Returns all order_details with the given name
 
-
+        Args:
+            name (string): the name of the order_detail you want to match
+        """
+        logger.info("Processing name query for %s ...", name)
+        return cls.query.filter(cls.name == name)
