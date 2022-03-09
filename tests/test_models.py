@@ -77,18 +77,33 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_order, 1)
         self.assertEqual(order.date_order, '02/22/2022')
 
-    # def test_add_a_order(self):
-    #     """Create a order and add it to the database"""
-    #     orders = Pet.all()
-    #     self.assertEqual(orders, [])
-    #     order = Pet(name="fido", category="dog", available=True, gender=Gender.Male)
-    #     self.assertTrue(order != None)
-    #     self.assertEqual(order.id, None)
-    #     order.create()
-    #     # Asert that it was assigned an id and shows up in the database
-    #     self.assertEqual(order.id, 1)
-    #     orders = Pet.all()
-    #     self.assertEqual(len(orders), 1)
+    def test_add_a_order(self):
+        """Create a order and add it to the database"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1)
+        order.create()
+        # Asert that it was assigned an id and shows up in the database
+        self.assertEqual(order.id_order, 1)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)
+
+
+    def test_find_order(self):
+        """Find a Order by ID"""
+        orders = OrderFactory.create_batch(3)
+        for order in orders:
+            order.create()
+        logging.debug(orders)
+        # make sure they got saved
+        self.assertEqual(len(Order.all()), 3)
+        # find the 2nd order in the list
+        order = Order.find(orders[1].id_order)
+        self.assertIsNot(order, None)
+        self.assertEqual(order.id_order, orders[1].id_order)
+        self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
+        self.assertEqual(order.date_order, orders[1].date_order)
+
 
     # def test_update_a_order(self):
     #     """Update a Pet"""
@@ -181,20 +196,6 @@ class TestPetModel(unittest.TestCase):
     #     order = Pet()
     #     self.assertRaises(DataValidationError, order.deserialize, data)
 
-    # def test_find_order(self):
-    #     """Find a Pet by ID"""
-    #     orders = PetFactory.create_batch(3)
-    #     for order in orders:
-    #         order.create()
-    #     logging.debug(orders)
-    #     # make sure they got saved
-    #     self.assertEqual(len(Pet.all()), 3)
-    #     # find the 2nd order in the list
-    #     order = Pet.find(orders[1].id)
-    #     self.assertIsNot(order, None)
-    #     self.assertEqual(order.id, orders[1].id)
-    #     self.assertEqual(order.name, orders[1].name)
-    #     self.assertEqual(order.available, orders[1].available)
 
     # def test_find_by_category(self):
     #     """Find Pets by Category"""
