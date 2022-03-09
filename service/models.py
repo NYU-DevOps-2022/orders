@@ -31,7 +31,7 @@ class customers(db.Model):
     name = db.Column(db.varchar(45), nullable=False)
 
     def __repr__(self):
-        return "<customers %r id=[%s]>" % (self.name, self.id_customer)
+        return f"<customers {self.name!r} id=[{self.id_customer}]>"
     
     def serialize(self):
         """ Serializes a customers into a dictionary """
@@ -76,7 +76,7 @@ class products(db.Model):
 
 
     def __repr__(self):
-        return "<products %r id=[%s]>" % (self.name, self.id_product)
+        return f"<products {self.name!r} id=[{self.id_product}]>"
     
     def serialize(self):
         """ Serializes a products into a dictionary """
@@ -125,7 +125,7 @@ class order_header(db.Model):
     id_customer_order = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return "<order id=[%s]>" % (self.id)
+        return f"<order id=[{self.id}]>"
 
     def create(self):
         """
@@ -231,7 +231,7 @@ class order_detail(db.Model):
     price_order = db.Column(db.DECIMAL(10, 2), default=NULL)
 
     def __repr__(self):
-        return "<order id=[%s]>" % (self.order_id)
+        return f"<order id=[{self.order_id}]>"
 
     def create(self):
         """
