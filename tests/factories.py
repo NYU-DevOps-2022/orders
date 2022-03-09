@@ -16,18 +16,19 @@
 Test Factory to make fake objects for testing
 """
 import factory
+from datetime import datetime, timezone
 from factory.fuzzy import FuzzyChoice
 from factory.fuzzy import FuzzyDateTime
 from factory.fuzzy import FuzzyInteger
 from service.models import Order
 
 
-class PetFactory(factory.Factory):
+class OrderFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
 
     class Meta:
         model = Order
 
     id_order = factory.Sequence(lambda n: n)
-    date_order = FuzzyDateTime(datetime.datetime(2020, 1, 1, tzinfo=UTC))
+    date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
     id_customer_order = FuzzyInteger(1, 999)
