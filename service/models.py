@@ -195,26 +195,22 @@ class order_header(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
+    def find(cls, id_order):
         """ Finds a order_header by it's ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+        logger.info("Processing lookup for id %s ...", id_order)
+        return cls.query.get(id_order)
 
     @classmethod
-    def find_or_404(cls, by_id):
+    def find_or_404(cls, id_order):
         """ Find a order_header by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
+        logger.info("Processing lookup or 404 for id %s ...", id_order)
+        return cls.query.get_or_404(id_order)
 
     @classmethod
-    def find_by_name(cls, name):
-        """Returns all order_header with the given name
-
-        Args:
-            name (string): the name of the order_header you want to match
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+    def find_by_customer(cls, id_customer_order):
+        """ Returns all order_header with the given customer id """
+        logger.info("Processing name query for %s ...", id_customer_order)
+        return cls.query.filter(cls.id_customer_order == id_customer_order)
 
 
 class order_detail(db.Model):
@@ -304,25 +300,16 @@ class order_detail(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
+    def find(cls, order_id):
         """ Finds a order_detail by it's ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+        logger.info("Processing lookup for id %s ...", order_id)
+        return cls.query.get(order_id)
 
     @classmethod
-    def find_or_404(cls, by_id):
+    def find_or_404(cls, order_id):
         """ Find a order_detail by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
+        logger.info("Processing lookup or 404 for id %s ...", order_id)
+        return cls.query.get_or_404(order_id)
 
-    @classmethod
-    def find_by_name(cls, name):
-        """Returns all order_detail with the given name
-
-        Args:
-            name (string): the name of the order_detail you want to match
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
 
 
