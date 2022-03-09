@@ -19,21 +19,22 @@ Test cases can be run with:
     nosetests
     coverage report -m
 
-While debugging just these tests it's convinient to use this:
+While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_orders.py:TestPetModel
 
 """
-import os
 import logging
+import os
 import unittest
 from werkzeug.exceptions import NotFound
 from service.models import Order, DataValidationError, db
 from service import app
-from .factories import OrderFactory
+from service.models import Order, db
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
+
 
 ######################################################################
 #  P E T   M O D E L   T E S T   C A S E S
@@ -69,10 +70,10 @@ class TestPetModel(unittest.TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_create_a_order(self):
-        """Create a order and assert that it exists"""
+    def test_create_order(self):
+        """Create an order and assert that it exists"""
         order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1)
-        self.assertTrue(order != None)        
+        self.assertIsNotNone(order)
         self.assertEqual(order.id_order, 1)
         self.assertEqual(order.date_order, '02/22/2022')
 
