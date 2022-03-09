@@ -190,7 +190,7 @@ class order_header(db.Model):
         logger.info("Processing all order_header")
         return cls.query.all()
 
-    @classmethod
+
     def find(cls, by_id):
         """ Finds an order_header by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
@@ -203,14 +203,10 @@ class order_header(db.Model):
         return cls.query.get_or_404(by_id)
 
     @classmethod
-    def find_by_name(cls, name):
-        """Returns all order_header with the given name
-
-        Args:
-            name (string): the name of the order_header you want to match
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+    def find_by_customer(cls, id_customer_order):
+        """ Returns all order_header with the given customer id """
+        logger.info("Processing name query for %s ...", id_customer_order)
+        return cls.query.filter(cls.id_customer_order == id_customer_order)
 
 
 class order_detail(db.Model):
@@ -299,7 +295,7 @@ class order_detail(db.Model):
         logger.info("Processing all order_detail")
         return cls.query.all()
 
-    @classmethod
+
     def find(cls, by_id):
         """ Finds an order_detail by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
