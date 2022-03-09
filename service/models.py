@@ -33,14 +33,14 @@ class Order(db.Model):
     id_customer_order = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"<order id=[{self.id}]>"
+        return f"<order id=[{self.id_order}]>"
 
     def create(self):
         """
         Creates a order_header to the database
         """
-        logger.info("Creating %s", self.name)
-        self.id = None  # id must be none to generate next primary key
+        logger.info("Creating %s", self.id_order)
+        self.id_order = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
