@@ -16,7 +16,7 @@ db = SQLAlchemy()
 
 
 class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
+    """ Used for a data validation errors when deserializing """
 
     pass
 
@@ -134,19 +134,19 @@ class order_header(db.Model):
 
     def save(self):
         """
-        Updates a order_header to the database
+        Updates an order_header to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """ Removes a order_header from the data store """
+        """ Removes an order_header from the data store """
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a order_header into a dictionary """
+        """ Serializes an order_header into a dictionary """
         return {
             "id_order": self.id_order,
             "date_order": self.date_order,
@@ -155,7 +155,7 @@ class order_header(db.Model):
 
     def deserialize(self, data):
         """
-        Deserializes a order_header from a dictionary
+        Deserializes an order_header from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -186,19 +186,19 @@ class order_header(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the order_header in the database """
+        """ Returns all of the order_headers in the database """
         logger.info("Processing all order_header")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a order_header by it's ID """
+        """ Finds an order_header by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
     def find_or_404(cls, by_id):
-        """ Find a order_header by it's id """
+        """ Find an order_header by its id """
         logger.info("Processing lookup or 404 for id %s ...", by_id)
         return cls.query.get_or_404(by_id)
 
@@ -231,7 +231,7 @@ class order_detail(db.Model):
 
     def create(self):
         """
-        Creates a order_detail to the database
+        Creates an order_detail to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # id must be none to generate next primary key
@@ -240,19 +240,19 @@ class order_detail(db.Model):
 
     def save(self):
         """
-        Updates a order_detail to the database
+        Updates an order_detail to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """ Removes a order_detail from the data store """
+        """ Removes an order_detail from the data store """
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a order_detail into a dictionary """
+        """ Serializes an order_detail into a dictionary """
         return {
             "order_id": self.order_id,
             "product_id": self.product_id,
@@ -262,7 +262,7 @@ class order_detail(db.Model):
 
     def deserialize(self, data):
         """
-        Deserializes a order_detail from a dictionary
+        Deserializes an order_detail from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -301,19 +301,19 @@ class order_detail(db.Model):
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a order_detail by it's ID """
+        """ Finds an order_detail by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
     def find_or_404(cls, by_id):
-        """ Find a order_detail by it's id """
+        """ Find an order_detail by its id """
         logger.info("Processing lookup or 404 for id %s ...", by_id)
         return cls.query.get_or_404(by_id)
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all order_detail with the given name
+        """Returns all order_details with the given name
 
         Args:
             name (string): the name of the order_detail you want to match
