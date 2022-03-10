@@ -72,16 +72,20 @@ class TestPetModel(unittest.TestCase):
 
     def test_create_order(self):
         """Create an order and assert that it exists"""
-        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1)
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
+    
         self.assertIsNotNone(order)
         self.assertEqual(order.id_order, 1)
         self.assertEqual(order.date_order, '02/22/2022')
+        self.assertEqual(order.product_id, 1)
+        self.assertEqual(order.quantity_order, 5)
+        self.assertEqual(order.price_order, 10)
 
     def test_add_a_order(self):
         """Create a order and add it to the database"""
         orders = Order.all()
         self.assertEqual(orders, [])
-        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1)
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
         order.create()
         # Asert that it was assigned an id and shows up in the database
         self.assertEqual(order.id_order, 1)
@@ -102,6 +106,9 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_order, orders[1].id_order)
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
         self.assertEqual(order.date_order, orders[1].date_order)
+
+
+
 
     # def test_update_a_order(self):
     #     """Update a Pet"""

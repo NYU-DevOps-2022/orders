@@ -31,6 +31,9 @@ class Order(db.Model):
     id_order = db.Column(db.Integer, primary_key=True)
     date_order = db.Column(db.DateTime(), default=datetime.now)
     id_customer_order = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    quantity_order = db.Column(db.Integer, default=0)
+    price_order = db.Column(db.DECIMAL(10, 2), default=0)
 
     def __repr__(self):
         return f"<order id=[{self.id_order}]>"
@@ -71,7 +74,10 @@ class Order(db.Model):
         return {
             "id_order": self.id_order,
             "date_order": self.date_order,
-            "id_customer_order": self.id_customer_order
+            "id_customer_order": self.id_customer_order,
+            "product_id": self.product_id,
+            "quantity_order": self.quantity_order,
+            "price_order": self.price_order
         }
 
     def deserialize(self, data):
@@ -85,6 +91,11 @@ class Order(db.Model):
             # self.id_order = data["id_order"]
             self.date_order = data["date_order"]
             self.id_customer_order = data["id_customer_order"]
+
+            self.product_id = data["product_id"]
+            self.quantity_order = data["quantity_order"]
+            self.price_order = data["price_order"]
+
         except KeyError as error:
             raise DataValidationError(
                 "Invalid order_header: missing " + error.args[0]

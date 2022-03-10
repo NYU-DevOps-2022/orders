@@ -86,7 +86,7 @@ def create_orders():
     Creates a Order
     This endpoint will create a Order based the data in the body that is posted
     e.g:
-    curl -X POST -H 'Content-Type: application/json' -d '{ "date_order":"02/21/2022", "id_customer_order":"3" }' 'http://localhost:8000/orders'
+    curl -X POST -H 'Content-Type: application/json' -d '{ "date_order":"02/21/2022", "id_customer_order":"3", "product_id": "9", "quantity_order": "5", "price_order": "10" }' 'http://localhost:8000/orders'
     """
     app.logger.info("Request to create a order")
     check_content_type("application/json")

@@ -7,8 +7,10 @@ Test cases can be run with the following:
 """
 from unittest import TestCase
 
+import werkzeug
+from flask import Flask, request
 from service import status  # HTTP Status Codes
-from service.routes import app, init_db
+from service.routes import app, init_db, list_orders, check_content_type, get_order
 from .factories import OrderFactory
 
 # DATABASE_URI = os.getenv(
@@ -71,6 +73,16 @@ class order(TestCase):
 
     # TODO(ELF): test modifying order
 
+    def test_list_orders(self):
+        """Test a list of orders"""
+        self.assertEqual(b'[]\n', list_orders().data)
+        test_order = self._create_order(1)[0]
+        self.assertTrue(list_orders().data)
+        resp = self.app.delete(
+            f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(b'[]\n', list_orders().data)
+
     def test_delete_order(self):
         """Delete an Order"""
         init_db()
@@ -85,3 +97,14 @@ class order(TestCase):
             f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_check_content_type(self):
+        # with self.assertRaises(RuntimeError):
+        #     check_content_type("blah")
+        with app.test_request_context():
+            with self.assertRaises(werkzeug.exceptions.UnsupportedMediaType):
+                check_content_type("blah")
+
+    # def test_get_order(self):
+    #     test_order = self._create_order(1)[0]
+    #     self.assertEqual("a", get_order(test_order.id_order))
