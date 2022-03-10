@@ -28,9 +28,10 @@ import os
 import unittest
 
 import flask_sqlalchemy
+from werkzeug.exceptions import NotFound
 
 from service import app
-from service.models import Order, db
+from service.models import Order, db, DataValidationError
 from .factories import OrderFactory
 
 DATABASE_URI = os.getenv(
@@ -184,11 +185,11 @@ class TestPetModel(unittest.TestCase):
     #     order = Pet()
     #     self.assertRaises(DataValidationError, order.deserialize, data)
 
-    # def test_deserialize_bad_data(self):
-    #     """Test deserialization of bad data"""
-    #     data = "this is not a dictionary"
-    #     order = Pet()
-    #     self.assertRaises(DataValidationError, order.deserialize, data)
+    def test_deserialize_bad_data(self):
+        """Test deserialization of bad data"""
+        data = "this is not a dictionary"
+        order = Order()
+        self.assertRaises(DataValidationError, order.deserialize, data)
 
     # def test_deserialize_bad_available(self):
     #     """ Test deserialization of bad available attribute """
@@ -254,21 +255,26 @@ class TestPetModel(unittest.TestCase):
     #     order_list = [order for order in orders]
     #     self.assertEqual(len(order_list), 2)
 
-    # def test_find_or_404_found(self):
-    #     """Find or return 404 found"""
-    #     orders = PetFactory.create_batch(3)
-    #     for order in orders:
-    #         order.create()
+    def test_find_or_404_found(self):
+        """Find or return 404 found"""
+        orders = OrderFactory.create_batch(3)
+        for order in orders:
+            order.create()
 
-    #     order = Pet.find_or_404(orders[1].id)
-    #     self.assertIsNot(order, None)
-    #     self.assertEqual(order.id, orders[1].id)
-    #     self.assertEqual(order.name, orders[1].name)
-    #     self.assertEqual(order.available, orders[1].available)
+        order = Order.find_or_404(orders[1].id_order)
+        self.assertIsNot(order, None)
+        self.assertEqual(order.id_order, orders[1].id_order)
+        self.assertEqual(order.date_order, orders[1].date_order)
+        self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
+        self.assertEqual(order.product_id, orders[1].product_id)
+        self.assertEqual(order.quantity_order, orders[1].quantity_order)
+        self.assertEqual(order.price_order, orders[1].price_order)
 
-    # def test_find_or_404_not_found(self):
-    #     """Find or return 404 NOT found"""
-    #     self.assertRaises(NotFound, Pet.find_or_404, 0)
+
+
+    def test_find_or_404_not_found(self):
+        """Find or return 404 NOT found"""
+        self.assertRaises(NotFound, Order.find_or_404, 0)
 
     def test_find_by_customer(self):
         order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
