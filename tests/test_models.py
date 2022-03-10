@@ -82,18 +82,18 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.price_order, 10)
 
     def test_add_a_order(self):
-        """Create a order and add it to the database"""
+        """Create an order and add it to the database"""
         orders = Order.all()
         self.assertEqual(orders, [])
         order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
         order.create()
-        # Asert that it was assigned an id and shows up in the database
+        # Assert that it was assigned an id and shows up in the database
         self.assertEqual(order.id_order, 1)
         orders = Order.all()
         self.assertEqual(len(orders), 1)
 
     def test_find_order(self):
-        """Find a Order by ID"""
+        """Find an Order by ID"""
         orders = OrderFactory.create_batch(3)
         for order in orders:
             order.create()
@@ -140,7 +140,7 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(len(Order.all()), 0)
 
     def test_serialize_a_order(self):
-        """Test serialization of a Order"""
+        """Test serialization of an Order"""
         order = OrderFactory()
         data = order.serialize()
         self.assertNotEqual(data, None)
@@ -157,7 +157,7 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(data["price_order"], order.price_order)
 
     def test_deserialize_a_order(self):
-        """Test deserialization of a Order"""
+        """Test deserialization of an Order"""
         data = {
             "id_order": 1,
             "date_order": "02/22/2022",
