@@ -59,7 +59,7 @@ class Order(db.Model):
         Updates an Order to the database
         """
         logger.info("Saving %s", self.id_order)
-        if not self.id:
+        if not self.id_order:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
