@@ -51,6 +51,15 @@ class Order(db.Model):
         logger.info("Saving %s", self.name)
         db.session.commit()
 
+    def update(self):
+        """
+        Updates an Order to the database
+        """
+        logger.info("Saving %s", self.id_order)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
+        db.session.commit()
+
     def delete(self):
         """ Removes an order_header from the data store """
         logger.info("Deleting %s", self.id_order)

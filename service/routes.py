@@ -102,6 +102,27 @@ def create_orders():
     )
 
 
+###################################################################### 
+#  UPDATE AN Order
+######################################################################
+
+@app.route("/orders/<int:id_order>", methods=["PUT"]) 
+def update_orders(id_order):     
+    """     
+    Update an order  
+    """     
+    app.logger.info("Request to update pet with id: %s", id_order)     
+    check_content_type("application/json")     
+    order = order.find(id_order)     
+    if not order:         
+        raise NotFound("order with id '{}' was not found.".format(id_order))     
+    order.deserialize(request.get_json())     
+    order.id_order = id_order    
+    order.update()      
+    app.logger.info("Pet with ID [%s] updated.", order.id_order)     
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK) 
+
+
 ######################################################################
 # DELETE AN ORDER
 ######################################################################
