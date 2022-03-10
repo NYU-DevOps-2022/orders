@@ -27,6 +27,8 @@ import logging
 import os
 import unittest
 
+import flask_sqlalchemy
+
 from service import app
 from service.models import Order, db
 from .factories import OrderFactory
@@ -267,3 +269,8 @@ class TestPetModel(unittest.TestCase):
     # def test_find_or_404_not_found(self):
     #     """Find or return 404 NOT found"""
     #     self.assertRaises(NotFound, Pet.find_or_404, 0)
+
+    def test_find_by_customer(self):
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
+        order.create()
+        self.assertTrue(flask_sqlalchemy.BaseQuery, type(order.find_by_customer(1)))
