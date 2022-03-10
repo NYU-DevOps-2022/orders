@@ -139,39 +139,42 @@ class TestPetModel(unittest.TestCase):
         order.delete()
         self.assertEqual(len(Order.all()), 0)
 
-    # def test_serialize_a_order(self):
-    #     """Test serialization of a Pet"""
-    #     order = PetFactory()
-    #     data = order.serialize()
-    #     self.assertNotEqual(data, None)
-    #     self.assertIn("id", data)
-    #     self.assertEqual(data["id"], order.id)
-    #     self.assertIn("name", data)
-    #     self.assertEqual(data["name"], order.name)
-    #     self.assertIn("category", data)
-    #     self.assertEqual(data["category"], order.category)
-    #     self.assertIn("available", data)
-    #     self.assertEqual(data["available"], order.available)
-    #     self.assertIn("gender", data)
-    #     self.assertEqual(data["gender"], order.gender.name)
+    def test_serialize_a_order(self):
+        """Test serialization of a Order"""
+        order = OrderFactory()
+        data = order.serialize()
+        self.assertNotEqual(data, None)
+        self.assertEqual(data["id_order"], order.id_order)
+        self.assertIn("date_order", data)
+        self.assertEqual(data["date_order"], order.date_order)
+        self.assertIn("id_customer_order", data)
+        self.assertEqual(data["id_customer_order"], order.id_customer_order)
+        self.assertIn("product_id", data)
+        self.assertEqual(data["product_id"], order.product_id)
+        self.assertIn("quantity_order", data)
+        self.assertEqual(data["quantity_order"], order.quantity_order)
+        self.assertIn("price_order", data)
+        self.assertEqual(data["price_order"], order.price_order)
 
-    # def test_deserialize_a_order(self):
-    #     """Test deserialization of a Pet"""
-    #     data = {
-    #         "id": 1,
-    #         "name": "kitty",
-    #         "category": "cat",
-    #         "available": True,
-    #         "gender": "Female",
-    #     }
-    #     order = Pet()
-    #     order.deserialize(data)
-    #     self.assertNotEqual(order, None)
-    #     self.assertEqual(order.id, None)
-    #     self.assertEqual(order.name, "kitty")
-    #     self.assertEqual(order.category, "cat")
-    #     self.assertEqual(order.available, True)
-    #     self.assertEqual(order.gender, Gender.Female)
+    def test_deserialize_a_order(self):
+        """Test deserialization of a Order"""
+        data = {
+            "id_order": 1,
+            "date_order": "02/22/2022",
+            "id_customer_order": "2",
+            "product_id": "5",
+            "quantity_order": "20",
+            "price_order": "10",
+        }
+        order = Order()
+        order.deserialize(data)
+        self.assertNotEqual(order, None)
+        # self.assertEqual(order.id_order, 1)
+        self.assertEqual(order.date_order, "02/22/2022")
+        self.assertEqual(order.id_customer_order, "2")
+        self.assertEqual(order.product_id, "5")
+        self.assertEqual(order.quantity_order, "20")
+        self.assertEqual(order.price_order, "10")
 
     # def test_deserialize_missing_data(self):
     #     """Test deserialization of a Pet with missing data"""
