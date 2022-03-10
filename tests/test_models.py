@@ -26,6 +26,7 @@ While debugging just these tests it's convenient to use this:
 import logging
 import os
 import unittest
+from werkzeug.exceptions import NotFound
 
 import flask_sqlalchemy
 from werkzeug.exceptions import NotFound
@@ -176,16 +177,13 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.quantity_order, "20")
         self.assertEqual(order.price_order, "10")
 
-    def test_bad_update(self):
-        order = Order()
-        with self.assertRaises(DataValidationError):
-            order.update()
+    def test_deserialize_missing_data(self):
+        """Test deserialization of a Order with missing data"""
+        data = {"id_order": 1, "id_customer_order": "1"}
+        # data = id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
 
-    # def test_deserialize_missing_data(self):
-    #     """Test deserialization of a Pet with missing data"""
-    #     data = {"id": 1, "name": "kitty", "category": "cat"}
-    #     order = Pet()
-    #     self.assertRaises(DataValidationError, order.deserialize, data)
+        order = Order()
+        self.assertRaises(DataValidationError, order.deserialize, data)
 
     def test_deserialize_bad_data(self):
         """Test deserialization of bad data"""
@@ -195,10 +193,10 @@ class TestPetModel(unittest.TestCase):
 
     # def test_deserialize_bad_available(self):
     #     """ Test deserialization of bad available attribute """
-    #     test_order = PetFactory()
+    #     test_order = OrderFactory()
     #     data = test_order.serialize()
     #     data["available"] = "true"
-    #     order = Pet()
+    #     order = Order()
     #     self.assertRaises(DataValidationError, order.deserialize, data)
 
     def test_deserialize_bad_gender(self):
@@ -275,8 +273,3 @@ class TestPetModel(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Order.find_or_404, 0)
-
-    def test_find_by_customer(self):
-        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
-        order.create()
-        self.assertTrue(flask_sqlalchemy.BaseQuery, type(order.find_by_customer(1)))
