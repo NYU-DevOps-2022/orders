@@ -15,14 +15,14 @@ PUT /orders/{id} - updates a Order record in the database
 DELETE /orders/{id} - deletes a Order record in the database
 """
 
-from flask import jsonify, request, url_for, make_response, abort
+from flask import jsonify, make_response
 from werkzeug.exceptions import NotFound
+
 from service.models import Order
 from . import status  # HTTP Status Codes
-from . import app  # Import Flask application
+
 
 # Import Flask application
-from . import app
 
 ######################################################################
 # GET INDEX
@@ -40,6 +40,7 @@ def index():
         status.HTTP_200_OK,
     )
 
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -49,7 +50,6 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Order.init_db(app)
-
 
 
 ######################################################################
@@ -64,7 +64,7 @@ def get_order(id_order):
     """
     app.logger.info("Request to get order info with id: %s", id_order)
     order = Order.find(id_order)
-    
+
     if not order:
         raise NotFound("Order with id '{}' was not found.".format(id_order))
 
