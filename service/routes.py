@@ -21,8 +21,9 @@ from werkzeug.exceptions import NotFound
 from service.models import Order
 from . import status  # HTTP Status Codes
 
-
 # Import Flask application
+from . import app
+
 
 ######################################################################
 # GET INDEX
