@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from factory.fuzzy import FuzzyChoice
 from factory.fuzzy import FuzzyDateTime
 from factory.fuzzy import FuzzyInteger
+from factory.fuzzy import FuzzyFloat
 from service.models import Order
 
 
@@ -32,3 +33,6 @@ class OrderFactory(factory.Factory):
     id_order = factory.Sequence(lambda n: n)
     date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
     id_customer_order = FuzzyInteger(1, 999)
+    product_id = FuzzyInteger(1, 999)
+    quantity_order = FuzzyInteger(1, 10)
+    price_order = FuzzyFloat(0.5, 10.0)
