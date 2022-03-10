@@ -47,12 +47,13 @@ class Order(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
-        """
-        Updates an order_header to the database
-        """
-        logger.info("Saving %s", self.name)
-        db.session.commit()
+    # TODO: Do we need this?
+    # def save(self):
+    #     """
+    #     Updates an order_header to the database
+    #     """
+    #     logger.info("Saving %s", self.name)
+    #     db.session.commit()
 
     def update(self):
         """
@@ -139,7 +140,6 @@ class Order(db.Model):
         """ Returns all order_header with the given customer id """
         logger.info("Processing name query for %s ...", id_customer_order)
         return cls.query.filter(cls.id_customer_order == id_customer_order)
-
 
 # class order_detail(db.Model):
 #     """

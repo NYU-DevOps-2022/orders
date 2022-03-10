@@ -110,25 +110,25 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
         self.assertEqual(order.date_order, orders[1].date_order)
 
-    # def test_update_a_order(self):
-    #     """Update a Pet"""
-    #     order = PetFactory()
-    #     logging.debug(order)
-    #     order.create()
-    #     logging.debug(order)
-    #     self.assertEqual(order.id, 1)
-    #     # Change it an save it
-    #     order.category = "k9"
-    #     original_id = order.id
-    #     order.update()
-    #     self.assertEqual(order.id, original_id)
-    #     self.assertEqual(order.category, "k9")
-    #     # Fetch it back and make sure the id hasn't changed
-    #     # but the data did change
-    #     orders = Pet.all()
-    #     self.assertEqual(len(orders), 1)
-    #     self.assertEqual(orders[0].id, 1)
-    #     self.assertEqual(orders[0].category, "k9")
+    def test_update_order(self):
+        """Update an order"""
+        order = OrderFactory()
+        logging.debug(order)
+        order.create()
+        logging.debug(order)
+        self.assertEqual(order.id_order, 1)
+        # Change it and save it
+        order.category = "k9"
+        original_id = order.id_order
+        order.update()
+        self.assertEqual(order.id_order, original_id)
+        self.assertEqual(order.category, "k9")
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)
+        self.assertEqual(orders[0].id_order, 1)
+        self.assertEqual(orders[0].category, "k9")
 
     def test_delete_a_order(self):
         """Delete an Order"""
@@ -175,6 +175,11 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.product_id, "5")
         self.assertEqual(order.quantity_order, "20")
         self.assertEqual(order.price_order, "10")
+
+    def test_bad_update(self):
+        order = Order()
+        with self.assertRaises(DataValidationError):
+            order.update()
 
     # def test_deserialize_missing_data(self):
     #     """Test deserialization of a Pet with missing data"""
