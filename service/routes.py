@@ -133,7 +133,7 @@ def delete_pets(id_order):
     Delete an Order
     This endpoint will delete an Order based the id specified in the path
     e.g:
-    curl -X DELETE 'http://localhost:8000/orders/1' 
+    curl -X DELETE 'http://localhost:8000/orders/1'
 
     """
     app.logger.info("Request to delete order with id: %s", id_order)
