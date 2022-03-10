@@ -71,7 +71,7 @@ def get_order(id_order):
     order = Order.find(id_order)
 
     if not order:
-        raise NotFound("Order with id '{}' was not found.".format(id_order))
+        raise NotFound(f"Order with id '{id_order}' was not found.")
 
     app.logger.info("Returning order: %s", order.id_order)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
@@ -115,7 +115,7 @@ def update_orders(id_order):
     check_content_type("application/json")     
     order = Order.find(id_order)
     if not order:         
-        raise NotFound("order with id '{}' was not found.".format(id_order))     
+        raise NotFound(f"order with id '{id_order}' was not found.")     
     order.deserialize(request.get_json())     
     order.id_order = id_order    
     order.update()      
@@ -165,5 +165,5 @@ def check_content_type(media_type):
     app.logger.error("Invalid Content-Type: %s", content_type)
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        "Content-Type must be {}".format(media_type),
+        f"Content-Type must be {media_type}",
     )
