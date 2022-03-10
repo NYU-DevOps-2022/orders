@@ -105,6 +105,9 @@ class order(TestCase):
             with self.assertRaises(werkzeug.exceptions.UnsupportedMediaType):
                 check_content_type("blah")
 
-    # def test_get_order(self):
-    #     test_order = self._create_order(1)[0]
-    #     self.assertEqual("a", get_order(test_order.id_order))
+    def test_get_order(self):
+        test_order = self._create_order(1)[0]
+        self.assertTrue(get_order(test_order.id_order))
+        resp = self.app.delete(
+            f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
+        )
