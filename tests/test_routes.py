@@ -10,7 +10,7 @@ from unittest import TestCase
 import werkzeug
 from flask import Flask, request
 from service import status  # HTTP Status Codes
-from service.routes import app, init_db, list_orders, check_content_type, get_order
+from service.routes import app, init_db, list_orders, check_content_type, get_order, update_orders
 from .factories import OrderFactory
 
 # DATABASE_URI = os.getenv(
@@ -111,3 +111,11 @@ class order(TestCase):
         resp = self.app.delete(
             f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
         )
+
+    # def test_update_orders(self):
+    #     test_order = self._create_order(1)[0]
+    #     with app.test_request_context(content_type='application/json'):
+    #         self.assertTrue(update_orders(test_order.id_order))
+    #     resp = self.app.delete(
+    #         f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
+    #     )
