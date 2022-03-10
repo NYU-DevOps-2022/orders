@@ -53,7 +53,7 @@ class Order(db.Model):
 
     def delete(self):
         """ Removes an order_header from the data store """
-        logger.info("Deleting %s", self.name)
+        logger.info("Deleting %s", self.id_order)
         db.session.delete(self)
         db.session.commit()
 
@@ -73,7 +73,7 @@ class Order(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id_order = data["id_order"]
+            # self.id_order = data["id_order"]
             self.date_order = data["date_order"]
             self.id_customer_order = data["id_customer_order"]
         except KeyError as error:
@@ -201,6 +201,7 @@ class order_detail(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
+
 
     @classmethod
     def all(cls):

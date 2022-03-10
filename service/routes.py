@@ -35,20 +35,26 @@ def index():
         jsonify(
             name="Order Demo REST API Service",
             version="1.0",
-            # paths=url_for("list_order", _external=True),
+            paths=url_for("list_orders", _external=True),
         ),
         status.HTTP_200_OK,
     )
 
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
 
 
-def init_db():
-    """ Initializes the SQLAlchemy app """
-    global app
-    Order.init_db(app)
+######################################################################
+# LIST ALL ORDERS
+######################################################################
+@app.route("/orders", methods=["GET"])
+def list_orders():
+    """Returns all of the Orders"""
+    app.logger.info("Request for order list")
+    
+    orders = Order.all()
+
+    results = [order.serialize() for order in orders]
+    app.logger.info("Returning %d orders", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 
@@ -68,8 +74,33 @@ def get_order(id_order):
     if not order:
         raise NotFound("Order with id '{}' was not found.".format(id_order))
 
-    app.logger.info("Returning order: %s", order.id)
+    app.logger.info("Returning order: %s", order.id_order)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# ADD A NEW Order
+######################################################################
+@app.route("/orders", methods=["POST"])
+def create_orders():
+    """
+    Creates a Order
+    This endpoint will create a Order based the data in the body that is posted
+    e.g:
+    curl -X POST -H 'Content-Type: application/json' -d '{ "date_order":"02/21/2022", "id_customer_order":"3" }' 'http://localhost:8000/orders'
+    """
+    app.logger.info("Request to create a order")
+    check_content_type("application/json")
+    order = Order()
+    order.deserialize(request.get_json())
+    order.create()
+    message = order.serialize()
+    location_url = url_for("get_order", id_order=order.id_order, _external=True)
+
+    app.logger.info("Order with ID [%s] created.", order.id_order)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
 
 ######################################################################
@@ -81,12 +112,39 @@ def delete_pets(id_order):
     """
     Delete an Order
     This endpoint will delete an Order based the id specified in the path
+    e.g:
+    curl -X DELETE 'http://localhost:8000/orders/1' 
+
     """
     app.logger.info("Request to delete order with id: %s", id_order)
-    order = order_detail.find(id_order)
+    order = Order.find(id_order)
     if order:
-        order_detail.delete()
-        order_header.delete()
+        # order_detail.delete()
+        order.delete()
 
     app.logger.info("Order with ID [%s] delete complete.", id_order)
     return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def init_db():
+    """ Initializes the SQLAlchemy app """
+    global app
+    Order.init_db(app)
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

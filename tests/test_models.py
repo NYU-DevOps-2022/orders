@@ -30,6 +30,8 @@ from werkzeug.exceptions import NotFound
 from service.models import Order, DataValidationError, db
 from service import app
 from service.models import Order, db
+from .factories import OrderFactory
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -125,14 +127,14 @@ class TestPetModel(unittest.TestCase):
     #     self.assertEqual(orders[0].id, 1)
     #     self.assertEqual(orders[0].category, "k9")
 
-    # def test_delete_a_order(self):
-    #     """Delete a Pet"""
-    #     order = PetFactory()
-    #     order.create()
-    #     self.assertEqual(len(Pet.all()), 1)
-    #     # delete the order and make sure it isn't in the database
-    #     order.delete()
-    #     self.assertEqual(len(Pet.all()), 0)
+    def test_delete_a_order(self):
+        """Delete an Order"""
+        order = OrderFactory()
+        order.create()
+        self.assertEqual(len(Order.all()), 1)
+        # delete the order and make sure it isn't in the database
+        order.delete()
+        self.assertEqual(len(Order.all()), 0)
 
     # def test_serialize_a_order(self):
     #     """Test serialization of a Pet"""
