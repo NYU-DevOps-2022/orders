@@ -102,7 +102,6 @@ class Order(db.Model):
         logger.info("Processing all order_header")
         return cls.query.all()
 
-
     @classmethod
     def find(cls, by_id):
         """ Finds an order_header by its ID """
@@ -202,13 +201,11 @@ class order_detail(db.Model):
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
-
     @classmethod
     def all(cls):
         """ Returns all of the order_detail in the database """
         logger.info("Processing all order_detail")
         return cls.query.all()
-
 
     def find(cls, by_id):
         """ Finds an order_detail by its ID """

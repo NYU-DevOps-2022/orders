@@ -26,12 +26,10 @@ While debugging just these tests it's convenient to use this:
 import logging
 import os
 import unittest
-from werkzeug.exceptions import NotFound
-from service.models import Order, DataValidationError, db
+
 from service import app
 from service.models import Order, db
 from .factories import OrderFactory
-
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -90,7 +88,6 @@ class TestPetModel(unittest.TestCase):
         orders = Order.all()
         self.assertEqual(len(orders), 1)
 
-
     def test_find_order(self):
         """Find a Order by ID"""
         orders = OrderFactory.create_batch(3)
@@ -105,7 +102,6 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_order, orders[1].id_order)
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
         self.assertEqual(order.date_order, orders[1].date_order)
-
 
     # def test_update_a_order(self):
     #     """Update a Pet"""
@@ -197,7 +193,6 @@ class TestPetModel(unittest.TestCase):
     #     data["gender"] = "male" # wrong case
     #     order = Pet()
     #     self.assertRaises(DataValidationError, order.deserialize, data)
-
 
     # def test_find_by_category(self):
     #     """Find Pets by Category"""
