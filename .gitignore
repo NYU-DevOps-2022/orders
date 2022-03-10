@@ -221,3 +221,4 @@ ENV/
 .idea/orders.iml
 .idea/vcs.xml
 
+.idea/.name
