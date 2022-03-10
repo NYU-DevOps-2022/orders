@@ -76,7 +76,7 @@ class TestPetModel(unittest.TestCase):
     def test_create_order(self):
         """Create an order and assert that it exists"""
         order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
-    
+
         self.assertIsNotNone(order)
         self.assertEqual(order.id_order, 1)
         self.assertEqual(order.date_order, '02/22/2022')
@@ -109,9 +109,6 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_order, orders[1].id_order)
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
         self.assertEqual(order.date_order, orders[1].date_order)
-
-
-
 
     # def test_update_a_order(self):
     #     """Update a Pet"""
@@ -199,13 +196,13 @@ class TestPetModel(unittest.TestCase):
     #     order = Pet()
     #     self.assertRaises(DataValidationError, order.deserialize, data)
 
-    # def test_deserialize_bad_gender(self):
-    #     """ Test deserialization of bad gender attribute """
-    #     test_order = PetFactory()
-    #     data = test_order.serialize()
-    #     data["gender"] = "male" # wrong case
-    #     order = Pet()
-    #     self.assertRaises(DataValidationError, order.deserialize, data)
+    def test_deserialize_bad_gender(self):
+        """ Test deserialization of bad gender attribute """
+        test_order = OrderFactory()
+        data = test_order.serialize()
+        del data["quantity_order"]
+        order = Order()
+        self.assertRaises(DataValidationError, order.deserialize, data)
 
     # def test_find_by_category(self):
     #     """Find Pets by Category"""
@@ -269,8 +266,6 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.product_id, orders[1].product_id)
         self.assertEqual(order.quantity_order, orders[1].quantity_order)
         self.assertEqual(order.price_order, orders[1].price_order)
-
-
 
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
