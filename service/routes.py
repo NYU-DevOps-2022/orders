@@ -17,12 +17,12 @@ DELETE /orders/{id} - deletes a Order record in the database
 
 from flask import jsonify, request, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
+
 from service.models import Order
 from . import status  # HTTP Status Codes
-from . import app  # Import Flask application
+
 
 # Import Flask application
-from . import app
 
 ######################################################################
 # GET INDEX
@@ -41,7 +41,6 @@ def index():
     )
 
 
-
 ######################################################################
 # LIST ALL ORDERS
 ######################################################################
@@ -49,13 +48,12 @@ def index():
 def list_orders():
     """Returns all of the Orders"""
     app.logger.info("Request for order list")
-    
+
     orders = Order.all()
 
     results = [order.serialize() for order in orders]
     app.logger.info("Returning %d orders", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
-
 
 
 ######################################################################
@@ -70,7 +68,7 @@ def get_order(id_order):
     """
     app.logger.info("Request to get order info with id: %s", id_order)
     order = Order.find(id_order)
-    
+
     if not order:
         raise NotFound("Order with id '{}' was not found.".format(id_order))
 
@@ -126,8 +124,6 @@ def delete_pets(id_order):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
-
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -137,6 +133,7 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Order.init_db(app)
+
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""

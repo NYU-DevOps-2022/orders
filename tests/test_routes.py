@@ -5,16 +5,11 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
-import os
-import logging
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+
 from service import status  # HTTP Status Codes
-from service.models import db
-from service.routes import app, init_db
+from service.routes import app
 from .factories import OrderFactory
-
-
 
 # DATABASE_URI = os.getenv(
 #     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -74,10 +69,8 @@ class order(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-
-
     # def test_delete_order(self):
-        
+
     #     """Delete an Order"""
     #     test_order = self._create_order(1)[0]
     #     resp = self.app.delete(
