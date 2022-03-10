@@ -112,10 +112,20 @@ class order(TestCase):
             f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
         )
 
-    # def test_update_orders(self):
-    #     test_order = self._create_order(1)[0]
-    #     with app.test_request_context(content_type='application/json'):
-    #         self.assertTrue(update_orders(test_order.id_order))
-    #     resp = self.app.delete(
-    #         f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
-    #     )
+    def test_update_orders(self):
+        test_order = self._create_order(1)[0]
+        test_order.product_id += 1
+        resp = self.app.put(
+            f"{BASE_URL}/{test_order.id_order}",
+            json=test_order.serialize(),
+            content_type=CONTENT_TYPE_JSON,         
+            )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)         
+        updated_order = resp.get_json()         
+        self.assertEqual(updated_order["product_id"], test_order.product_id)
+        resp = self.app.put(
+            f"{BASE_URL}/{2}",
+            json=test_order.serialize(),
+            content_type=CONTENT_TYPE_JSON,         
+            )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
