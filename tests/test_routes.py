@@ -8,7 +8,7 @@ Test cases can be run with the following:
 from unittest import TestCase
 
 from service import status  # HTTP Status Codes
-from service.routes import app
+from service.routes import app, init_db
 from .factories import OrderFactory
 
 # DATABASE_URI = os.getenv(
@@ -69,17 +69,19 @@ class order(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    # def test_delete_order(self):
+    # TODO(ELF): test modifying order
 
-    #     """Delete an Order"""
-    #     test_order = self._create_order(1)[0]
-    #     resp = self.app.delete(
-    #         "{0}/{1}".format(BASE_URL, test_order.id_order), content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-    #     self.assertEqual(len(resp.data), 0)
-    #     # make sure they are deleted
-    #     resp = self.app.get(
-    #         "{0}/{1}".format(BASE_URL, test_order.id_order), content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    def test_delete_order(self):
+        """Delete an Order"""
+        init_db()
+        test_order = self._create_order(1)[0]
+        resp = self.app.delete(
+            f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            f"{BASE_URL}/{test_order.id_order}", content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
