@@ -113,7 +113,7 @@ def update_orders(id_order):
     """     
     app.logger.info("Request to update pet with id: %s", id_order)     
     check_content_type("application/json")     
-    order = order.find(id_order)     
+    order = Order.find(id_order)
     if not order:         
         raise NotFound("order with id '{}' was not found.".format(id_order))     
     order.deserialize(request.get_json())     
