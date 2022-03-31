@@ -208,10 +208,8 @@ class order(TestCase):
 # Test Error Handlers
 ######################################################################
 
-    # @patch('service.routes.Order.find_by_customer')
     def test_400_bad_request(self):
         """ Test a Bad Request error from Find By Name """
-        # bad_request_mock.side_effect = []
         resp = self.app.get(BASE_URL, query_string='customer=999999')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
