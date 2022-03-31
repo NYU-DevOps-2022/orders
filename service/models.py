@@ -13,6 +13,10 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+def init_db(app):
+    """Initialize the SQLAlchemy app"""
+    Order.init_db(app)
+
 
 class DataValidationError(Exception):
     """ Used for a data validation errors when deserializing """
@@ -135,11 +139,11 @@ class Order(db.Model):
         logger.info("Processing lookup or 404 for id %s ...", by_id)
         return cls.query.get_or_404(by_id)
 
-    # @classmethod
-    # def find_by_customer(cls, id_customer_order):
-    #     """ Returns all order_header with the given customer id """
-    #     logger.info("Processing name query for %s ...", id_customer_order)
-    #     return cls.query.filter(cls.id_customer_order == id_customer_order)
+    @classmethod
+    def find_by_customer(cls, id_customer_order):
+        """ Returns all order_header with the given customer id """
+        logger.info("Processing name query for %s ...", id_customer_order)
+        return cls.query.filter(cls.id_customer_order == id_customer_order)
 
 # class order_detail(db.Model):
 #     """

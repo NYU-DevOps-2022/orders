@@ -15,6 +15,8 @@ PUT /orders/{id} - updates a Order record in the database
 DELETE /orders/{id} - deletes a Order record in the database
 """
 
+from asyncio.log import logger
+import logging
 from flask import jsonify, request, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
 
@@ -50,7 +52,15 @@ def list_orders():
     """Returns all of the Orders"""
     app.logger.info("Request for order list")
 
-    orders = Order.all()
+    orders = []
+    customer = request.args.get("customer")
+    
+    if customer:
+        orders = Order.find_by_customer(customer)
+        if orders.count() == 0:
+            return make_response(jsonify([]), status.HTTP_400_BAD_REQUEST)
+    else:
+        orders = Order.all()
 
     results = [order.serialize() for order in orders]
     app.logger.info("Returning %d orders", len(results))
@@ -68,10 +78,10 @@ def get_order(id_order):
     This endpoint will return an Order information based the id specified in the path
     """
     app.logger.info("Request to get order info with id: %s", id_order)
-    order = Order.find(id_order)
+    order = Order.find_or_404(id_order)
 
-    if not order:
-        raise NotFound(f"Order with id '{id_order}' was not found.")
+    # if not order:
+    #     raise NotFound(f"Order with id '{id_order}' was not found.")
 
     app.logger.info("Returning order: %s", order.id_order)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
