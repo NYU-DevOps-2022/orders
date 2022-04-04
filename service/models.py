@@ -35,9 +35,6 @@ class Order(db.Model):
     id_order = db.Column(db.Integer, primary_key=True)
     date_order = db.Column(db.DateTime(), default=datetime.now)
     id_customer_order = db.Column(db.Integer, nullable=False)
-    product_id = db.Column(db.Integer, nullable=False)
-    quantity_order = db.Column(db.Integer, default=0)
-    price_order = db.Column(db.DECIMAL(10, 2), default=0)
 
     def __repr__(self):
         return f"<order id=[{self.id_order}]>"
@@ -79,10 +76,7 @@ class Order(db.Model):
         return {
             "id_order": self.id_order,
             "date_order": self.date_order,
-            "id_customer_order": self.id_customer_order,
-            "product_id": self.product_id,
-            "quantity_order": self.quantity_order,
-            "price_order": self.price_order
+            "id_customer_order": self.id_customer_order
         }
 
     def deserialize(self, data):
@@ -96,10 +90,6 @@ class Order(db.Model):
             # self.id_order = data["id_order"]
             self.date_order = data["date_order"]
             self.id_customer_order = data["id_customer_order"]
-
-            self.product_id = data["product_id"]
-            self.quantity_order = data["quantity_order"]
-            self.price_order = data["price_order"]
 
         except KeyError as error:
             raise DataValidationError(
@@ -128,22 +118,112 @@ class Order(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
+    def find(cls, id_order):
         """ Finds an order_header by its ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+        logger.info("Processing lookup for id %s ...", id_order)
+        return cls.query.get(id_order)
 
     @classmethod
-    def find_or_404(cls, by_id):
+    def find_or_404(cls, id_order):
         """ Find an order_header by its id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
+        logger.info("Processing lookup or 404 for id %s ...", id_order)
+        return cls.query.get_or_404(id_order)
 
     @classmethod
     def find_by_customer(cls, id_customer_order):
         """ Returns all order_header with the given customer id """
         logger.info("Processing name query for %s ...", id_customer_order)
         return cls.query.filter(cls.id_customer_order == id_customer_order)
+
+class Orderitems(db.Model):
+    """
+    Class that represents a <your resource model name>
+    """
+
+    app = None
+
+    # Table Schema
+    id_orderitems = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('Order.id_order'))
+    product_id = db.Column(db.Integer, nullable=False)
+    product_price = db.Column(db.DECIMAL(10, 2), default=0)
+    product_quantity = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<id_orderitems=[{self.id_orderitems}]>"
+
+    def update(self):
+        """
+        Updates an orderitem to the database
+        """
+        logger.info("Saving %s", self.id_orderitems)
+        if not self.id_orderitems:
+            raise DataValidationError("Update called with empty ID field")
+        db.session.commit()
+
+    def delete(self):
+        """ Removes an orderitem from the data store """
+        logger.info("Deleting %s", self.id_orderitems)
+        db.session.delete(self)
+        db.session.commit()
+
+    def serialize(self):
+        """ Serializes a product into a dictionary """
+        return {
+            "id_orderitems": self.id_orderitems,
+            "order_id": self.order_id,
+            "product_id": self.product_id,
+            "product_price": self.product_price,
+            "product_quantity": self.product_quantity,
+        }
+
+    def deserialize(self, data):
+        """
+        Deserializes an order_header from a dictionary
+
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.order_id = data["order_id"]
+            self.product_id = data["product_id"]
+            self.product_price = data["product_price"]
+            self.product_quantity = data["product_quantity"]
+            self.price_product = data["price_product"]
+
+        except KeyError as error:
+            raise DataValidationError(
+                "Invalid product: missing " + error.args[0]
+            )
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid product: body of request contained bad or no data"
+            )
+        return self
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the orderitems in the database """
+        logger.info("Processing all orderitems")
+        return cls.query.all()
+
+    @classmethod
+    def find(cls, id_orderitems):
+        """ Finds an orderitem by its ID """
+        logger.info("Processing lookup for id %s ...", id_orderitems)
+        return cls.query.get(id_orderitems)
+
+    @classmethod
+    def find_or_404(cls, id_orderitems):
+        """ Find an orderitems by its id """
+        logger.info("Processing lookup or 404 for id %s ...", id_orderitems)
+        return cls.query.get_or_404(id_orderitems)
+
+    @classmethod
+    def find_by_product(cls, product_id):
+        """ Returns all orderitems with the given product id """
+        logger.info("Processing name query for %s ...", product_id)
+        return cls.query.filter(cls.product_id == product_id)
 
 # class order_detail(db.Model):
 #     """
