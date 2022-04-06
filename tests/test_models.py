@@ -85,7 +85,7 @@ class TestOrderModel(unittest.TestCase):
         self.assertEqual(order.id, 1)
         self.assertEqual(order.date_order, '02/22/2022')
 
-    def test_add_a_order(self):
+    def test_add_an_order(self):
         """Create an order and add it to the database"""
         orders = Order.all()
         self.assertEqual(orders, [])
@@ -196,7 +196,7 @@ class TestOrderModel(unittest.TestCase):
         with self.assertRaises(Exception) as e:
             order.update()
 
-    def test_delete_a_order(self):
+    def test_delete_an_order(self):
         """Delete an Order"""
         order = OrderFactory()
         order.create()
@@ -205,7 +205,7 @@ class TestOrderModel(unittest.TestCase):
         order.delete()
         self.assertEqual(len(Order.all()), 0)
 
-    def test_serialize_a_order(self):
+    def test_serialize_an_order(self):
         """Test serialization of an Order"""
         order = OrderFactory()
         data = order.serialize()
@@ -289,3 +289,14 @@ class TestOrderModel(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Order.find_or_404, 0)
+
+    def test_find_order_by_date_order(self):
+        """Find an order by the date order"""
+
+        orders = OrderFactory.create_batch(3)
+        for order in orders:
+            order.create()
+
+        order = Order.find_by_date_order(orders[1].date_order)
+        self.assertIsNotNone(order)
+        self.assertEqual(order.date_order, orders[1].date_order)
