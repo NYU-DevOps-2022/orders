@@ -35,30 +35,30 @@ class Order(db.Model):
     app = None
 
     # Table Schema
-    id_order = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date_order = db.Column(db.DateTime(), default=datetime.now)
-    id_customer_order = db.Column(db.Integer, nullable=False)
+    customer_id = db.Column(db.Integer, nullable=False)
 
     # Relationship
     items = db.relationship("OrderItem", back_populates="order", cascade="all, delete",passive_deletes=True)
 
     def __repr__(self):
-        return f"<order id=[{self.id_order}]>"
+        return f"<order id=[{self.id}]>"
 
     def create(self):
         """
         Creates a order_header to the database
         """
-        logger.info("Creating %s", self.id_order)
-        #todo: Change id_order to id
-        self.id_order = None  # id must be none to generate next primary key
+        logger.info("Creating %s", self.id)
+        #todo: Change id to id
+        self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
         if hasattr(self,'item_list'):
             for item in self.item_list:
                 order_item = OrderItem()
-                item['order_id'] = self.id_order
+                item['order_id'] = self.id
                 order_item.deserialize(item)
                 order_item.create()
 
@@ -66,23 +66,23 @@ class Order(db.Model):
         """
         Updates an Order to the database
         """
-        logger.info("Saving %s", self.id_order)
-        if not self.id_order:
+        logger.info("Saving %s", self.id)
+        if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
         """ Removes an order_header from the data store """
-        logger.info("Deleting %s", self.id_order)
+        logger.info("Deleting %s", self.id)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
         """ Serializes an order_header into a dictionary """
         return {
-            "id_order": self.id_order,
+            "id": self.id,
             "date_order": self.date_order,
-            "id_customer_order": self.id_customer_order,
+            "customer_id": self.customer_id,
             "items" : [item.serialize() for item in self.items]
         }
 
@@ -95,7 +95,7 @@ class Order(db.Model):
         """
         try:
             self.date_order = data["date_order"]
-            self.id_customer_order = data["id_customer_order"]
+            self.customer_id = data["customer_id"]
 
             if hasattr(data, "item_list"):
                 self.item_list = data["item_list"]
@@ -127,22 +127,22 @@ class Order(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, id_order):
+    def find(cls, id):
         """ Finds an order_header by its ID """
-        logger.info("Processing lookup for id %s ...", id_order)
-        return cls.query.get(id_order)
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.get(id)
 
     @classmethod
-    def find_or_404(cls, id_order):
+    def find_or_404(cls, id):
         """ Find an order_header by its id """
-        logger.info("Processing lookup or 404 for id %s ...", id_order)
-        return cls.query.get_or_404(id_order)
+        logger.info("Processing lookup or 404 for id %s ...", id)
+        return cls.query.get_or_404(id)
 
     @classmethod
-    def find_by_customer(cls, id_customer_order):
+    def find_by_customer(cls, customer_id):
         """ Returns all order_header with the given customer id """
-        logger.info("Processing name query for %s ...", id_customer_order)
-        return cls.query.filter(cls.id_customer_order == id_customer_order)
+        logger.info("Processing name query for %s ...", customer_id)
+        return cls.query.filter(cls.customer_id == customer_id)
 
 class OrderItem(db.Model):
     """
@@ -152,7 +152,7 @@ class OrderItem(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id_order', ondelete="CASCADE"))
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id', ondelete="CASCADE"))
     product_id = db.Column(db.Integer, nullable=False)
     product_price = db.Column(db.DECIMAL(10, 2), default=0)
     product_quantity = db.Column(db.Integer, nullable=False)

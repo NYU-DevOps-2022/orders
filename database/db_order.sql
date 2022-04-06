@@ -43,7 +43,7 @@ CREATE TABLE `order_detail` (
   `product_id` int NOT NULL,
   PRIMARY KEY (`order_id`),
   KEY `product_id_idx` (`product_id`),
-  CONSTRAINT `order_detail_id` FOREIGN KEY (`order_id`) REFERENCES `order_header` (`id_order`),
+  CONSTRAINT `order_detail_id` FOREIGN KEY (`order_id`) REFERENCES `order_header` (`id`),
   CONSTRAINT `product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`ID_Product`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -56,12 +56,12 @@ DROP TABLE IF EXISTS `order_header`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order_header` (
-  `id_order` int NOT NULL,
+  `id` int NOT NULL,
   `Date_order` date DEFAULT NULL,
-  `id_customer_order` int DEFAULT NULL,
-  PRIMARY KEY (`id_order`),
-  KEY `customer_order_id_idx` (`id_customer_order`),
-  CONSTRAINT `customer_order_id` FOREIGN KEY (`id_customer_order`) REFERENCES `customers` (`ID_Customer`)
+  `customer_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `customer_order_id_idx` (`customer_id`),
+  CONSTRAINT `customer_order_id` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`ID_Customer`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

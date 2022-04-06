@@ -32,9 +32,9 @@ class OrderFactory(factory.Factory):
     class Meta:
         model = Order
 
-    id_order = factory.Sequence(lambda n: n)
+    id = factory.Sequence(lambda n: n)
     date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
-    id_customer_order = FuzzyInteger(1, 999)
+    customer_id = FuzzyInteger(1, 999)
 
 class OrderItemFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""

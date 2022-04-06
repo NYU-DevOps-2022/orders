@@ -71,19 +71,19 @@ def list_orders():
 # GET AN ORDER INFO
 ######################################################################
 
-@app.route("/orders/<int:id_order>", methods=["GET"])
-def get_order(id_order):
+@app.route("/orders/<int:id>", methods=["GET"])
+def get_order(id):
     """
     Get info of an Order
     This endpoint will return an Order information based the id specified in the path
     """
-    app.logger.info("Request to get order info with id: %s", id_order)
-    order = Order.find_or_404(id_order)
+    app.logger.info("Request to get order info with id: %s", id)
+    order = Order.find_or_404(id)
 
     # if not order:
-    #     raise NotFound(f"Order with id '{id_order}' was not found.")
+    #     raise NotFound(f"Order with id '{id}' was not found.")
 
-    app.logger.info("Returning order: %s", order.id_order)
+    app.logger.info("Returning order: %s", order.id)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
@@ -100,7 +100,7 @@ def create_orders():
         --header 'Content-Type: application/json' \
         --data-raw '{ 
             "date_order":"02/21/2022", 
-            "id_customer_order":"3", 
+            "customer_id":"3", 
             "item_list":[    
                 {
                     "product_id": "1",
@@ -121,9 +121,9 @@ def create_orders():
     order.deserialize(request.get_json())
     order.create()
     message = order.serialize()
-    location_url = url_for("get_order", id_order=order.id_order, _external=True)
+    location_url = url_for("get_order", id=order.id, _external=True)
 
-    app.logger.info("Order with ID [%s] created.", order.id_order)
+    app.logger.info("Order with ID [%s] created.", order.id)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
@@ -133,20 +133,20 @@ def create_orders():
 #  UPDATE AN Order
 ######################################################################
 
-@app.route("/orders/<int:id_order>", methods=["PUT"]) 
-def update_orders(id_order):     
+@app.route("/orders/<int:id>", methods=["PUT"]) 
+def update_orders(id):     
     """     
     Update an order  
     """     
-    app.logger.info("Request to update pet with id: %s", id_order)     
+    app.logger.info("Request to update pet with id: %s", id)     
     check_content_type("application/json")     
-    order = Order.find(id_order)
+    order = Order.find(id)
     if not order:         
-        raise NotFound(f"order with id '{id_order}' was not found.")     
+        raise NotFound(f"order with id '{id}' was not found.")     
     order.deserialize(request.get_json())     
-    order.id_order = id_order    
+    order.id = id    
     order.update()      
-    app.logger.info("Pet with ID [%s] updated.", order.id_order)     
+    app.logger.info("Pet with ID [%s] updated.", order.id)     
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK) 
 
 
@@ -154,8 +154,8 @@ def update_orders(id_order):
 # DELETE AN ORDER
 ######################################################################
 
-@app.route("/orders/<int:id_order>", methods=["DELETE"])
-def delete_pets(id_order):
+@app.route("/orders/<int:id>", methods=["DELETE"])
+def delete_pets(id):
     """
     Delete an Order
     This endpoint will delete an Order based the id specified in the path
@@ -163,13 +163,13 @@ def delete_pets(id_order):
     curl -X DELETE 'http://localhost:8000/orders/1'
 
     """
-    app.logger.info("Request to delete order with id: %s", id_order)
-    order = Order.find(id_order)
+    app.logger.info("Request to delete order with id: %s", id)
+    order = Order.find(id)
     if order:
         # order_detail.delete()
         order.delete()
 
-    app.logger.info("Order with ID [%s] delete complete.", id_order)
+    app.logger.info("Order with ID [%s] delete complete.", id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 

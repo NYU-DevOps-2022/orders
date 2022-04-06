@@ -76,7 +76,7 @@ class order(TestCase):
                 resp.status_code, status.HTTP_201_CREATED, "Could not create test order"
             )
             new_order = resp.get_json()
-            test_order.id_order = new_order["id_order"]
+            test_order.id = new_order["id"]
             orders.append(test_order)
         return orders
 
@@ -104,11 +104,11 @@ class order(TestCase):
         """Get a single Order"""
         test_order = self._create_order(1)[0]
         resp = self.app.get(
-            "/orders/{}".format(test_order.id_order), content_type=CONTENT_TYPE_JSON
+            "/orders/{}".format(test_order.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data["id_order"], test_order.id_order)
+        self.assertEqual(data["id"], test_order.id)
 
     def test_get_order_not_found(self):
         """Get a order thats not found"""
@@ -135,7 +135,7 @@ class order(TestCase):
             new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
         )
         self.assertEqual(
-            new_order["id_customer_order"], test_order.id_customer_order, "Customer id does not match"
+            new_order["customer_id"], test_order.customer_id, "Customer id does not match"
         )
         
         # Check that the location header was correct
@@ -147,7 +147,7 @@ class order(TestCase):
             new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
         )
         self.assertEqual(
-            new_order["id_customer_order"], test_order.id_customer_order, "Customer id does not match"
+            new_order["customer_id"], test_order.customer_id, "Customer id does not match"
         )
 
 
@@ -163,35 +163,35 @@ class order(TestCase):
         # update the order
         new_order = resp.get_json()
         logging.debug(new_order)
-        new_order["id_customer_order"] = 99999
+        new_order["customer_id"] = 99999
         resp = self.app.put(
-            "/orders/{}".format(new_order["id_order"]),
+            "/orders/{}".format(new_order["id"]),
             json=new_order,
             content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_order = resp.get_json()
-        self.assertEqual(updated_order["id_customer_order"], 99999)
+        self.assertEqual(updated_order["customer_id"], 99999)
 
     def test_delete_order(self):
         """Delete a order"""
         test_order = self._create_order(1)[0]
         resp = self.app.delete(
-            "{0}/{1}".format(BASE_URL, test_order.id_order), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_URL, test_order.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "{0}/{1}".format(BASE_URL, test_order.id_order), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_URL, test_order.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_order_list_by_customer(self):
         """Query orders by Customer"""
         orders = self._create_order(10)
-        test_id_customer = orders[0].id_customer_order
-        customer_orders = [order for order in orders if order.id_customer_order == test_id_customer]
+        test_id_customer = orders[0].customer_id
+        customer_orders = [order for order in orders if order.customer_id == test_id_customer]
         
         resp = self.app.get(
             BASE_URL, query_string="customer={}".format(test_id_customer)
@@ -202,7 +202,7 @@ class order(TestCase):
         self.assertEqual(len(data), len(customer_orders))
         # check the data just to be sure
         for order in data:
-            self.assertEqual(order["id_customer_order"], test_id_customer)
+            self.assertEqual(order["customer_id"], test_id_customer)
 
 ######################################################################
 # Test Error Handlers
@@ -232,7 +232,7 @@ class order(TestCase):
 
     # def test_method_500_internal_server_error(self):
     #     test_order_1 = OrderFactory()
-    #     test_order_1.id_customer_order = 'xxxxxx'
+    #     test_order_1.customer_id = 'xxxxxx'
         
     #     resp = self.app.post(
     #         BASE_URL, json=test_order_1.serialize(), content_type=CONTENT_TYPE_JSON
