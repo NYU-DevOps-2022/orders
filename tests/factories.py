@@ -14,15 +14,17 @@
 
 """
 Test Factory to make fake objects for testing
+Reference: https://simpleit.rocks/python/django/setting-up-a-factory-for-one-to-many-relationships-in-factoryboy/
+
 """
-import factory
+from pydoc import ModuleScanner
 from datetime import datetime, timezone
+from service.models import Order, OrderItem
+import factory
 from factory.fuzzy import FuzzyChoice
 from factory.fuzzy import FuzzyDateTime
 from factory.fuzzy import FuzzyInteger
 from factory.fuzzy import FuzzyFloat
-from service.models import Order
-
 
 class OrderFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
@@ -30,9 +32,40 @@ class OrderFactory(factory.Factory):
     class Meta:
         model = Order
 
-    id_order = factory.Sequence(lambda n: n)
+    id = factory.Sequence(lambda n: n)
     date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
-    id_customer_order = FuzzyInteger(1, 999)
+    customer_id = FuzzyInteger(1, 999)
+
+class OrderItemFactory(factory.Factory):
+    """Creates fake orders that you don't have to feed"""
+
+    class Meta:
+        model = OrderItem
+
+    order = factory.SubFactory(OrderFactory)
+    id = factory.Sequence(lambda n: n)
     product_id = FuzzyInteger(1, 999)
-    quantity_order = FuzzyInteger(1, 10)
-    price_order = FuzzyFloat(0.5, 10.0)
+    product_quantity = FuzzyInteger(1, 10)
+    product_price = FuzzyFloat(0.5, 10.0)
+
+class OrderWithItemsFactory(OrderFactory):
+    
+    @factory.post_generation
+    def items(obj, create, extracted, **kwargs):
+        """
+        If called like: OrderFactory(items=4) it generates an Order with 4
+        items.  If called without `items` argument, it generates a
+        random amount of items for this order
+        """
+        if not create:
+            # Build, not create related
+            return
+
+        if extracted:
+            for n in range(extracted):
+                OrderItemFactory(order=obj)
+        else:
+            import random
+            number_of_units = random.randint(1, 10)
+            for n in range(number_of_units):
+                OrderItemFactory(order=obj)
