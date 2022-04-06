@@ -54,11 +54,14 @@ def list_orders():
 
     orders = []
     customer = request.args.get("customer")
+    date_order = request.args.get("date_order")
     
     if customer:
         orders = Order.find_by_customer(customer)
         if orders.count() == 0:
             abort(status.HTTP_400_BAD_REQUEST)
+    if date_order:
+        orders = Order.find_by_date_order(date_order)
     else:
         orders = Order.all()
 

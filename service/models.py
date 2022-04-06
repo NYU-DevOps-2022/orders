@@ -144,6 +144,12 @@ class Order(db.Model):
         logger.info("Processing name query for %s ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id)
 
+    @classmethod
+    def find_by_date_order(cls, date_order):
+        """ Returns all order_header with the given customer id """
+        logger.info("Processing name query for %s ...", date_order)
+        return cls.query.filter(cls.date_order == date_order)
+
 class OrderItem(db.Model):
     """
     Class that represents a <your resource model name>
