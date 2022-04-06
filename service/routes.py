@@ -28,20 +28,38 @@ from . import app
 
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/healthcheck")
+def healthcheck():
+    """Let them know our heart is still beating"""
+    return make_response(jsonify(status=200, message="Healthy"), status.HTTP_200_OK)
+
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
 def index():
-    """ Root URL response """
-    app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Order Demo REST API Service",
-            version="1.0",
-            paths=url_for("list_orders", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    """Base URL for our service"""
+    return app.send_static_file("index.html")
+
+
+# ######################################################################
+# # GET INDEX
+# ######################################################################
+# @app.route("/")
+# def index():
+#     """ Root URL response """
+#     app.logger.info("Request for Root URL")
+#     return (
+#         jsonify(
+#             name="Order Demo REST API Service",
+#             version="1.0",
+#             paths=url_for("list_orders", _external=True),
+#         ),
+#         status.HTTP_200_OK,
+#     )
 
 
 ######################################################################
@@ -57,6 +75,7 @@ def list_orders():
     
     if customer:
         orders = Order.find_by_customer(customer)
+        logger.info("Search order by customer id: %d", customer)
         if orders.count() == 0:
             abort(status.HTTP_400_BAD_REQUEST)
     else:
@@ -146,7 +165,7 @@ def update_orders(id):
     order.deserialize(request.get_json())     
     order.id = id    
     order.update()      
-    app.logger.info("Pet with ID [%s] updated.", order.id)     
+    app.logger.info("Order with ID [%s] updated.", order.id)     
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK) 
 
 
