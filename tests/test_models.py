@@ -78,20 +78,20 @@ class TestOrderModel(unittest.TestCase):
 
     def test_create_order(self):
         """Create an order and assert that it exists"""
-        order = Order(id=1, 
-        date_order='02/22/2022', customer_id=1)
+        order = Order(id=1,
+                      date_order='02/22/2022', customer_id=1)
 
         self.assertIsNotNone(order)
         self.assertEqual(order.id, 1)
         self.assertEqual(order.date_order, '02/22/2022')
 
-    def test_add_a_order(self):
+    def test_add_an_order(self):
         """Create an order and add it to the database"""
         orders = Order.all()
         self.assertEqual(orders, [])
         order = Order(id=1, date_order='02/22/2022', customer_id=1, items=[
-            OrderItem(order_id=1, product_id=3, product_price = 10, product_quantity=20),
-            OrderItem(order_id=1, product_id=5, product_price = 15, product_quantity=10)
+            OrderItem(order_id=1, product_id=3, product_price=10, product_quantity=20),
+            OrderItem(order_id=1, product_id=5, product_price=15, product_quantity=10)
         ])
         order.create()
         # Assert that it was assigned an id and shows up in the database
@@ -109,17 +109,16 @@ class TestOrderModel(unittest.TestCase):
         order.item_list = [
             dict({"product_id": 1, "product_quantity": 3, "product_price": 5}),
             dict({"product_id": 5, "product_quantity": 10, "product_price": 20})
-            ] 
+        ]
 
         order.create()
-
 
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(order.id, 1)
         self.assertEqual(len(order.items), 2)
         orders = Order.all()
         self.assertEqual(len(orders), 1)
-    
+
     def test_find_order(self):
         """Find an Order by ID"""
         orders = OrderFactory.create_batch(3)
@@ -142,14 +141,14 @@ class TestOrderModel(unittest.TestCase):
         self.assertTrue(len(order.items) == 5)
         for item in order.items:
             self.assertIsInstance(item, OrderItem)
-    
+
     def test_update_order(self):
         """Update an order with empty id"""
         order = OrderFactory()
         order.create()
         item1 = OrderItemFactory.create(order=order)
         item2 = OrderItemFactory.create(order=order)
-        
+
         self.assertEqual(order.id, 1)
         self.assertEqual(len(order.items), 2)
 
@@ -162,11 +161,11 @@ class TestOrderModel(unittest.TestCase):
         self.assertTrue(len(order.items) == 1)
         for item in order.items:
             self.assertIsInstance(item, OrderItem)
-        
-        origin_quantity = order.items[0].product_quantity 
-        order.items[0].product_quantity =  order.items[0].product_quantity + 20 
+
+        origin_quantity = order.items[0].product_quantity
+        order.items[0].product_quantity = order.items[0].product_quantity + 20
         order.items[0].update()
-        
+
         updated_order = Order.find_or_404(order.id)
 
         self.assertNotEqual(origin_quantity, updated_order.items[0].product_quantity)
@@ -178,9 +177,9 @@ class TestOrderModel(unittest.TestCase):
 
         self.assertIsInstance(order, Order)
         self.assertTrue(len(order.items) == 2)
-        
+
         order.items[0].delete()
-        
+
         updated_order = Order.find_or_404(order.id)
 
         self.assertEqual(len(updated_order.items), 1)
@@ -193,12 +192,11 @@ class TestOrderModel(unittest.TestCase):
         # Change it and save it
         original_id = order.id
         order.id = None
-        
+
         with self.assertRaises(Exception) as e:
             order.update()
 
-
-    def test_delete_a_order(self):
+    def test_delete_an_order(self):
         """Delete an Order"""
         order = OrderFactory()
         order.create()
@@ -207,7 +205,7 @@ class TestOrderModel(unittest.TestCase):
         order.delete()
         self.assertEqual(len(Order.all()), 0)
 
-    def test_serialize_a_order(self):
+    def test_serialize_an_order(self):
         """Test serialization of an Order"""
         order = OrderFactory()
         data = order.serialize()
@@ -226,7 +224,7 @@ class TestOrderModel(unittest.TestCase):
         }
         order = Order()
         order.deserialize(data)
-        self.assertNotEqual(order, None)    
+        self.assertNotEqual(order, None)
         self.assertEqual(order.date_order, "02/22/2022")
         self.assertEqual(order.customer_id, "2")
 
@@ -241,7 +239,7 @@ class TestOrderModel(unittest.TestCase):
 
         item = OrderItem()
         item.deserialize(data)
-        self.assertNotEqual(item, None)    
+        self.assertNotEqual(item, None)
         self.assertEqual(item.product_id, "5")
         self.assertEqual(item.product_price, "10")
         self.assertEqual(item.product_quantity, "2")
@@ -256,7 +254,7 @@ class TestOrderModel(unittest.TestCase):
 
         item = OrderItem()
         self.assertRaises(DataValidationError, item.deserialize, data)
-    
+
     def test_deserialize_order_item_bad_data(self):
         """Test deserialize of bad data"""
         data = "this is not a dictionary"
@@ -291,3 +289,14 @@ class TestOrderModel(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Order.find_or_404, 0)
+
+    def test_find_order_by_date_order(self):
+        """Find an order by the date order"""
+
+        orders = OrderFactory.create_batch(3)
+        for order in orders:
+            order.create()
+
+        order = Order.find_by_date_order(orders[1].date_order)
+        self.assertIsNotNone(order)
+        self.assertEqual(order.date_order, orders[1].date_order)
