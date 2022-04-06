@@ -58,7 +58,7 @@ def list_orders():
     if customer:
         orders = Order.find_by_customer(customer)
         if orders.count() == 0:
-            return make_response(jsonify([]), status.HTTP_400_BAD_REQUEST)
+            abort(status.HTTP_400_BAD_REQUEST)
     else:
         orders = Order.all()
 
@@ -96,7 +96,24 @@ def create_orders():
     Creates a Order
     This endpoint will create a Order based the data in the body that is posted
     e.g:
-    curl -X POST -H 'Content-Type: application/json' -d '{ "date_order":"02/21/2022", "id_customer_order":"3", "product_id": "9", "quantity_order": "5", "price_order": "10" }' 'http://localhost:8000/orders'
+    curl --location --request POST 'http://localhost:8000/orders' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{ 
+            "date_order":"02/21/2022", 
+            "id_customer_order":"3", 
+            "item_list":[    
+                {
+                    "product_id": "1",
+                    "product_quantity": "3",
+                    "product_price": "5"
+                },
+                {
+                    "product_id": "2",
+                    "product_quantity": "10",
+                    "product_price": "5"
+                }
+            ]
+        }'
     """
     app.logger.info("Request to create a order")
     check_content_type("application/json")

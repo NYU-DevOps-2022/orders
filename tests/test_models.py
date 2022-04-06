@@ -23,6 +23,8 @@ While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_orders.py:TestPetModel
 
 """
+# from asyncio.windows_events import NULL
+from asyncio.log import logger
 import logging
 import os
 import unittest
@@ -32,8 +34,8 @@ import flask_sqlalchemy
 from werkzeug.exceptions import NotFound
 
 from service import app
-from service.models import Order, db, DataValidationError
-from .factories import OrderFactory
+from service.models import Order, OrderItem, db, DataValidationError
+from .factories import OrderFactory, OrderItemFactory, OrderWithItemsFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -41,16 +43,16 @@ DATABASE_URI = os.getenv(
 
 
 ######################################################################
-#  P E T   M O D E L   T E S T   C A S E S
+#  Order   M O D E L   T E S T   C A S E S
 ######################################################################
-class TestPetModel(unittest.TestCase):
+class TestOrderModel(unittest.TestCase):
     """Test Cases for Order Model"""
 
     @classmethod
     def setUpClass(cls):
         """This runs once before the entire test suite"""
         app.config["TESTING"] = True
-        app.config["DEBUG"] = False
+        app.config["DEBUG"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         Order.init_db(app)
@@ -76,26 +78,48 @@ class TestPetModel(unittest.TestCase):
 
     def test_create_order(self):
         """Create an order and assert that it exists"""
-        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
+        order = Order(id_order=1, 
+        date_order='02/22/2022', id_customer_order=1)
 
         self.assertIsNotNone(order)
         self.assertEqual(order.id_order, 1)
         self.assertEqual(order.date_order, '02/22/2022')
-        self.assertEqual(order.product_id, 1)
-        self.assertEqual(order.quantity_order, 5)
-        self.assertEqual(order.price_order, 10)
 
     def test_add_a_order(self):
         """Create an order and add it to the database"""
         orders = Order.all()
         self.assertEqual(orders, [])
-        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1, items=[
+            OrderItem(order_id=1, product_id=3, product_price = 10, product_quantity=20),
+            OrderItem(order_id=1, product_id=5, product_price = 15, product_quantity=10)
+        ])
         order.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(order.id_order, 1)
+        self.assertEqual(len(order.items), 2)
         orders = Order.all()
         self.assertEqual(len(orders), 1)
 
+    def test_add_an_order_using_item_list(self):
+        """Create an order using item_list"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+        order = Order(id_order=1, date_order='02/22/2022', id_customer_order=1)
+
+        order.item_list = [
+            dict({"product_id": 1, "product_quantity": 3, "product_price": 5}),
+            dict({"product_id": 5, "product_quantity": 10, "product_price": 20})
+            ] 
+
+        order.create()
+
+
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(order.id_order, 1)
+        self.assertEqual(len(order.items), 2)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)
+    
     def test_find_order(self):
         """Find an Order by ID"""
         orders = OrderFactory.create_batch(3)
@@ -111,25 +135,68 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
         self.assertEqual(order.date_order, orders[1].date_order)
 
+    def test_create_order_with_items(self):
+        """Create order with multiple items"""
+        order = OrderWithItemsFactory(items=5)
+        self.assertIsInstance(order, Order)
+        self.assertTrue(len(order.items) == 5)
+        for item in order.items:
+            self.assertIsInstance(item, OrderItem)
+    
     def test_update_order(self):
-        """Update an order"""
+        """Update an order with empty id"""
         order = OrderFactory()
-        logging.debug(order)
         order.create()
-        logging.debug(order)
+        item1 = OrderItemFactory.create(order=order)
+        item2 = OrderItemFactory.create(order=order)
+        
+        self.assertEqual(order.id_order, 1)
+        self.assertEqual(len(order.items), 2)
+
+    def test_update_order_item_quantity(self):
+        """Create order with multiple items"""
+        order = OrderWithItemsFactory(items=1)
+        order.create()
+
+        self.assertIsInstance(order, Order)
+        self.assertTrue(len(order.items) == 1)
+        for item in order.items:
+            self.assertIsInstance(item, OrderItem)
+        
+        origin_quantity = order.items[0].product_quantity 
+        order.items[0].product_quantity =  order.items[0].product_quantity + 20 
+        order.items[0].update()
+        
+        updated_order = Order.find_or_404(order.id_order)
+
+        self.assertNotEqual(origin_quantity, updated_order.items[0].product_quantity)
+
+    def test_delete_order_item(self):
+        """Delete an order item"""
+        order = OrderWithItemsFactory(items=2)
+        order.create()
+
+        self.assertIsInstance(order, Order)
+        self.assertTrue(len(order.items) == 2)
+        
+        order.items[0].delete()
+        
+        updated_order = Order.find_or_404(order.id_order)
+
+        self.assertEqual(len(updated_order.items), 1)
+
+    def test_update_order_empty_id(self):
+        """Update an order with empty id"""
+        order = OrderFactory()
+        order.create()
         self.assertEqual(order.id_order, 1)
         # Change it and save it
-        order.category = "k9"
         original_id = order.id_order
-        order.update()
-        self.assertEqual(order.id_order, original_id)
-        self.assertEqual(order.category, "k9")
-        # Fetch it back and make sure the id hasn't changed
-        # but the data did change
-        orders = Order.all()
-        self.assertEqual(len(orders), 1)
-        self.assertEqual(orders[0].id_order, 1)
-        self.assertEqual(orders[0].category, "k9")
+        order.id_order = None
+        
+        with self.assertRaises(Exception) as e:
+            order.update()
+
 
     def test_delete_a_order(self):
         """Delete an Order"""
@@ -149,111 +216,65 @@ class TestPetModel(unittest.TestCase):
         self.assertIn("date_order", data)
         self.assertEqual(data["date_order"], order.date_order)
         self.assertIn("id_customer_order", data)
-        self.assertEqual(data["id_customer_order"], order.id_customer_order)
-        self.assertIn("product_id", data)
-        self.assertEqual(data["product_id"], order.product_id)
-        self.assertIn("quantity_order", data)
-        self.assertEqual(data["quantity_order"], order.quantity_order)
-        self.assertIn("price_order", data)
-        self.assertEqual(data["price_order"], order.price_order)
 
-    def test_deserialize_a_order(self):
+    def test_deserialize_an_order(self):
         """Test deserialization of an Order"""
         data = {
             "id_order": 1,
             "date_order": "02/22/2022",
             "id_customer_order": "2",
-            "product_id": "5",
-            "quantity_order": "20",
-            "price_order": "10",
         }
         order = Order()
         order.deserialize(data)
-        self.assertNotEqual(order, None)
-        # self.assertEqual(order.id_order, 1)
+        self.assertNotEqual(order, None)    
         self.assertEqual(order.date_order, "02/22/2022")
         self.assertEqual(order.id_customer_order, "2")
-        self.assertEqual(order.product_id, "5")
-        self.assertEqual(order.quantity_order, "20")
-        self.assertEqual(order.price_order, "10")
+
+    def test_deserialize_an_order_item(self):
+        """Test deserialization of an Order Item"""
+        data = {
+            "order_id": 1,
+            "product_id": "5",
+            "product_price": "10",
+            "product_quantity": "2",
+        }
+
+        item = OrderItem()
+        item.deserialize(data)
+        self.assertNotEqual(item, None)    
+        self.assertEqual(item.product_id, "5")
+        self.assertEqual(item.product_price, "10")
+        self.assertEqual(item.product_quantity, "2")
+
+    def test_deserialize_an_order_item_missing_data(self):
+        """Test deserialize of an Order Item"""
+        data = {
+            "order_id": 1,
+            "product_price": "10",
+            "product_quantity": "2",
+        }
+
+        item = OrderItem()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+    
+    def test_deserialize_order_item_bad_data(self):
+        """Test deserialize of bad data"""
+        data = "this is not a dictionary"
+        item = OrderItem()
+        self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_missing_data(self):
-        """Test deserialization of a Order with missing data"""
+        """Test deserialize of a Order with missing data"""
         data = {"id_order": 1, "id_customer_order": "1"}
-        # data = id_order=1, date_order='02/22/2022', id_customer_order=1, product_id=1, quantity_order=5, price_order=10)
 
         order = Order()
         self.assertRaises(DataValidationError, order.deserialize, data)
 
     def test_deserialize_bad_data(self):
-        """Test deserialization of bad data"""
+        """Test deserialize of bad data"""
         data = "this is not a dictionary"
         order = Order()
         self.assertRaises(DataValidationError, order.deserialize, data)
-
-    # def test_deserialize_bad_available(self):
-    #     """ Test deserialization of bad available attribute """
-    #     test_order = OrderFactory()
-    #     data = test_order.serialize()
-    #     data["available"] = "true"
-    #     order = Order()
-    #     self.assertRaises(DataValidationError, order.deserialize, data)
-
-    def test_deserialize_bad_gender(self):
-        """ Test deserialization of bad gender attribute """
-        test_order = OrderFactory()
-        data = test_order.serialize()
-        del data["quantity_order"]
-        order = Order()
-        self.assertRaises(DataValidationError, order.deserialize, data)
-
-    # def test_find_by_category(self):
-    #     """Find Pets by Category"""
-    #     Pet(name="fido", category="dog", available=True).create()
-    #     Pet(name="kitty", category="cat", available=False).create()
-    #     orders = Pet.find_by_category("cat")
-    #     self.assertEqual(orders[0].category, "cat")
-    #     self.assertEqual(orders[0].name, "kitty")
-    #     self.assertEqual(orders[0].available, False)
-
-    # def test_find_by_name(self):
-    #     """Find a Pet by Name"""
-    #     Pet(name="fido", category="dog", available=True).create()
-    #     Pet(name="kitty", category="cat", available=False).create()
-    #     orders = Pet.find_by_name("kitty")
-    #     self.assertEqual(orders[0].category, "cat")
-    #     self.assertEqual(orders[0].name, "kitty")
-    #     self.assertEqual(orders[0].available, False)
-
-    # def test_find_by_availability(self):
-    #     """Find Pets by Availability"""
-    #     Pet(name="fido", category="dog", available=True).create()
-    #     Pet(name="kitty", category="cat", available=False).create()
-    #     Pet(name="fifi", category="dog", available=True).create()
-    #     orders = Pet.find_by_availability(False)
-    #     order_list = [order for order in orders]
-    #     self.assertEqual(len(order_list), 1)
-    #     self.assertEqual(orders[0].name, "kitty")
-    #     self.assertEqual(orders[0].category, "cat")
-    #     orders = Pet.find_by_availability(True)
-    #     order_list = [order for order in orders]
-    #     self.assertEqual(len(order_list), 2)
-
-    # def test_find_by_gender(self):
-    #     """Find Pets by Gender"""
-    #     Pet(name="fido", category="dog", available=True, gender=Gender.Male).create()
-    #     Pet(
-    #         name="kitty", category="cat", available=False, gender=Gender.Female
-    #     ).create()
-    #     Pet(name="fifi", category="dog", available=True, gender=Gender.Male).create()
-    #     orders = Pet.find_by_gender(Gender.Female)
-    #     order_list = [order for order in orders]
-    #     self.assertEqual(len(order_list), 1)
-    #     self.assertEqual(orders[0].name, "kitty")
-    #     self.assertEqual(orders[0].category, "cat")
-    #     orders = Pet.find_by_gender(Gender.Male)
-    #     order_list = [order for order in orders]
-    #     self.assertEqual(len(order_list), 2)
 
     def test_find_or_404_found(self):
         """Find or return 404 found"""
@@ -266,9 +287,6 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(order.id_order, orders[1].id_order)
         self.assertEqual(order.date_order, orders[1].date_order)
         self.assertEqual(order.id_customer_order, orders[1].id_customer_order)
-        self.assertEqual(order.product_id, orders[1].product_id)
-        self.assertEqual(order.quantity_order, orders[1].quantity_order)
-        self.assertEqual(order.price_order, orders[1].price_order)
 
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
