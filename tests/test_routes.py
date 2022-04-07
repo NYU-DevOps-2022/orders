@@ -191,7 +191,7 @@ class order(TestCase):
         customer_orders = [order for order in orders if order.customer_id == test_id_customer]
         
         resp = self.app.get(
-            BASE_URL, query_string="customer={}".format(test_id_customer)
+            BASE_URL, query_string=f"customer={test_id_customer}"
         )
         
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -213,7 +213,6 @@ class order(TestCase):
     def test_method_405_not_allowed(self):
         resp = self.app.put('/orders')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
     def test_method_404_not_found(self):
         resp = self.app.get('/order/876xx')
