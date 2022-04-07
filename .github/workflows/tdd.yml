@@ -1,0 +1,57 @@
+name: CI Build
+on:
+  push:
+    branches:
+      - main
+      - CI
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+#    container: Python 3 & PostgreSQL
+
+    # Required services
+    services:
+      # Label used to access the service container
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ci_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r requirements.txt
+      
+      # - name: Setup database
+      #   env:
+      #     POSTGRES_HOST: postgres
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_PASSWORD: postgres
+      #     POSTGRES_DB: ci_db_test
+      #     POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+      #   run: |
+      #     cp config/database.yml.ci config/database.yml
+
+      - name: Run unit tests with nose
+        run: nosetests
+        env:
+          DATABASE_URI: "postgresql://postgres:postgres@localhost:5432/postgres"
+      
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v2

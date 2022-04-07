@@ -9,6 +9,8 @@
 
 </pre>
 
+[![Build Status](https://github.com/NYU-DevOps-2022/orders/actions/workflows/tdd.yml/badge.svg)](https://github.com/NYU-DevOps-2022/orders/actions)
+
 
 ## Tests
 

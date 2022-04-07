@@ -89,7 +89,6 @@ class order(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-
     def test_get_order_list(self):
         """Get a list of Orders"""
         self._create_order(5)
@@ -109,7 +108,7 @@ class order(TestCase):
         self.assertEqual(data["id"], test_order.id)
 
     def test_get_order_not_found(self):
-        """Get a order thats not found"""
+        """Get an order that is not found"""
         resp = self.app.get("/orders/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -151,7 +150,7 @@ class order(TestCase):
 
     def test_update_order(self):
         """Update an existing order"""
-        # create a order to update
+        # create an order to update
         test_order = OrderFactory()
         resp = self.app.post(
             BASE_URL, json=test_order.serialize(), content_type=CONTENT_TYPE_JSON
@@ -172,7 +171,7 @@ class order(TestCase):
         self.assertEqual(updated_order["customer_id"], 99999)
 
     def test_delete_order(self):
-        """Delete a order"""
+        """Delete an order"""
         test_order = self._create_order(1)[0]
         resp = self.app.delete(
             "{0}/{1}".format(BASE_URL, test_order.id), content_type=CONTENT_TYPE_JSON
