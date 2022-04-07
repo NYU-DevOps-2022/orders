@@ -101,7 +101,7 @@ class order(TestCase):
         """Get a single Order"""
         test_order = self._create_order(1)[0]
         resp = self.app.get(
-            "/orders/{}".format(test_order.id), content_type=CONTENT_TYPE_JSON
+            f"/orders/{test_order.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -162,7 +162,7 @@ class order(TestCase):
         logging.debug(new_order)
         new_order["customer_id"] = 99999
         resp = self.app.put(
-            "/orders/{}".format(new_order["id"]),
+            f"/orders/{new_order['id']}",
             json=new_order,
             content_type=CONTENT_TYPE_JSON,
         )
@@ -174,13 +174,13 @@ class order(TestCase):
         """Delete an order"""
         test_order = self._create_order(1)[0]
         resp = self.app.delete(
-            "{0}/{1}".format(BASE_URL, test_order.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_order.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "{0}/{1}".format(BASE_URL, test_order.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_order.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
