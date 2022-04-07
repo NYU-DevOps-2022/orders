@@ -76,7 +76,7 @@ def list_orders():
     
     if customer:
         orders = Order.find_by_customer(customer)
-        logger.info("Search order by customer id: %d", customer)
+        # logger.info("Search order by customer id: %d", customer)
         if orders.count() == 0:
             abort(status.HTTP_400_BAD_REQUEST)
     if date_order:
