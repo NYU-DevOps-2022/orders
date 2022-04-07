@@ -2,8 +2,7 @@ name: CI Build
 on:
   push:
     branches:
-      - main
-      - CI
+      - "**"  # all branches
   pull_request:
     branches:
       - main
@@ -55,3 +54,5 @@ jobs:
       
       - name: Upload code coverage
         uses: codecov/codecov-action@v2
+        with: 
+          version: "v0.1.13"
