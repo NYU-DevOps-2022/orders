@@ -10,7 +10,7 @@
 </pre>
 
 [![Build Status](https://github.com/NYU-DevOps-2022/orders/actions/workflows/tdd.yml/badge.svg)](https://github.com/NYU-DevOps-2022/orders/actions)
-
+[![codecov](https://codecov.io/gh/NYU-DevOps-2022/orders/branch/main/graph/badge.svg?token=PTK7NZM3ZT)](https://codecov.io/gh/NYU-DevOps-2022/orders)
 
 ## Tests
 
