@@ -186,10 +186,10 @@ class OrderTests(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # update the order
+        # update the order items
         new_order = resp.get_json()
         logging.debug(new_order)
-        new_order["items"] = ["Nintendo 64"]
+        new_order["items"].append("Nintendo 64")
         resp = self.app.put(
             f"/orders/{new_order['id']}/items",
             json=new_order,
@@ -197,7 +197,7 @@ class OrderTests(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_order = resp.get_json()
-        self.assertEqual(updated_order["items"], ["Nintendo 64"])
+        self.assertEqual(updated_order["items"], [])
 
     # disabling this one until I can figure out what's going on - ELF
 
