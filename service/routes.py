@@ -115,8 +115,8 @@ def get_order(id):
 @app.route("/orders", methods=["POST"])
 def create_orders():
     """
-    Creates a Order
-    This endpoint will create a Order based the data in the body that is posted
+    Creates an Order
+    This endpoint will create an Order based the data in the body that is posted
     e.g:
     curl --location --request POST 'http://localhost:8000/orders' \
         --header 'Content-Type: application/json' \
@@ -137,7 +137,7 @@ def create_orders():
             ]
         }'
     """
-    app.logger.info("Request to create a order")
+    app.logger.info("Request to create an order")
     check_content_type("application/json")
     order = Order()
     order.deserialize(request.get_json())
@@ -177,7 +177,7 @@ def update_orders(id):
 ######################################################################
 
 @app.route("/orders/<int:id>", methods=["DELETE"])
-def delete_pets(id):
+def delete_orders(id):
     """
     Delete an Order
     This endpoint will delete an Order based the id specified in the path
