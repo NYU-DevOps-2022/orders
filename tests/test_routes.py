@@ -179,7 +179,25 @@ class OrderTests(TestCase):
 
     def test_update_order_items(self):
         """Update order items"""
-        test_order = self._create_order(1)[0]
+        # create an order to update
+        test_order = OrderFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_order.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the order
+        new_order = resp.get_json()
+        logging.debug(new_order)
+        new_order["customer_id"] = 99999
+        resp = self.app.put(
+            f"/orders/{new_order['id']}/items",
+            json=new_order,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_order = resp.get_json()
+        self.assertEqual(updated_order["customer_id"].items, 99999)
 
     # disabling this one until I can figure out what's going on - ELF
 
