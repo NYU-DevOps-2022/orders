@@ -47,7 +47,7 @@ class Order(db.Model):
 
     def create(self):
         """
-        Creates a order_header to the database
+        Creates an order_header in the database
         """
         logger.info("Creating %s", self.id)
         #todo: Change id to id
@@ -64,7 +64,7 @@ class Order(db.Model):
 
     def update(self):
         """
-        Updates an Order to the database
+        Updates an Order in the database
         """
         logger.info("Saving %s", self.id)
         if not self.id:
@@ -150,6 +150,7 @@ class Order(db.Model):
         # logger.info(f"Processing name query for {date_order} ...")
         return cls.query.filter(cls.date_order == date_order)
 
+
 class OrderItem(db.Model):
     """
     Class that represents a <your resource model name>
@@ -175,10 +176,9 @@ class OrderItem(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
     def update(self):
         """
-        Updates an orderitem to the database
+        Updates an orderitem in the database
         """
         logger.info("Saving %s", self.id)
         if not self.id:
