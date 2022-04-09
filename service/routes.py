@@ -73,7 +73,7 @@ def list_orders():
     orders = []
     customer = request.args.get("customer")
     date_order = request.args.get("date_order")
-    
+
     if customer:
         orders = Order.find_by_customer(customer)
         # logger.info("Search order by customer id: %d", customer)
@@ -155,21 +155,19 @@ def create_orders():
 #  UPDATE AN Order
 ######################################################################
 
-@app.route("/orders/<int:id>", methods=["PUT"]) 
-def update_orders(id):     
+@app.route("/orders/<int:id>", methods=["PUT"])
+def update_orders(id):
     """     
     Update an order  
-    """     
-    app.logger.info("Request to update pet with id: %s", id)     
-    check_content_type("application/json")     
-    order = Order.find(id)
-    if not order:         
-        raise NotFound(f"order with id '{id}' was not found.")     
-    order.deserialize(request.get_json())     
-    order.id = id    
-    order.update()      
-    app.logger.info("Order with ID [%s] updated.", order.id)     
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK) 
+    """
+    app.logger.info("Request to update pet with id: %s", id)
+    check_content_type("application/json")
+    order = check_valid_order(id)
+    order.deserialize(request.get_json())
+    order.id = id
+    order.update()
+    app.logger.info("Order with ID [%s] updated.", order.id)
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -196,8 +194,31 @@ def delete_orders(id):
 
 
 ######################################################################
+#  UPDATE Order items
+######################################################################
+
+
+@app.route("/orders/<int:id>/items", methods=["PUT"])
+def update_order_items(id):
+    app.logger.info("Request to update order items with id: %s", id)
+    check_content_type("application/json")
+    order = check_valid_order(id)
+    order.deserialize(request.get_json())
+    order.id = id
+    order.update()
+    app.logger.info("Order with ID [%s] updated.", order.id)
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+def check_valid_order(id):
+    order = Order.find(id)
+    if not order:
+        raise NotFound(f"order with id '{id}' was not found.")
+    return order
 
 
 def init_db():
