@@ -152,7 +152,7 @@ class Order(db.Model):
 
 class OrderItem(db.Model):
     """
-    Class that represents a <your resource model name>
+    Class that represents an Order Item
     """
     app = None
 
