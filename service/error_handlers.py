@@ -15,8 +15,10 @@
 Module: error_handlers
 """
 from flask import jsonify
+
 from service.models import DataValidationError
 from . import app, status
+
 
 ######################################################################
 # Error Handlers
@@ -83,7 +85,6 @@ def mediatype_not_supported(error):
         ),
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     )
-
 
 # @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 # def internal_server_error(error):

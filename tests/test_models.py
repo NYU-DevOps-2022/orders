@@ -24,13 +24,10 @@ While debugging just these tests it's convenient to use this:
 
 """
 # from asyncio.windows_events import NULL
-from asyncio.log import logger
 import logging
 import os
 import unittest
-from werkzeug.exceptions import NotFound
 
-import flask_sqlalchemy
 from werkzeug.exceptions import NotFound
 
 from service import app
