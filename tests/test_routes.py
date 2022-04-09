@@ -5,17 +5,12 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+import logging
+import os
 from unittest import TestCase
 
-import os
-import logging
-from unittest.mock import MagicMock, patch
-
-import werkzeug
-from flask import Flask, request
-from urllib.parse import quote_plus
 from service import app, status  # HTTP Status Codes
-from service.models import DataValidationError, db, init_db
+from service.models import db, init_db
 from .factories import OrderFactory
 
 # Disable all but critical errors during normal test run
@@ -26,7 +21,6 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 
-
 BASE_URL = "/orders"
 CONTENT_TYPE_JSON = "application/json"
 
@@ -34,7 +28,7 @@ CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class order(TestCase):
+class OrderTests(TestCase):
     """ REST API Server Tests """
 
     @classmethod
@@ -120,21 +114,21 @@ class order(TestCase):
             BASE_URL, json=test_order.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        
+
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
-        
+
         # Check the data is correct
         new_order = resp.get_json()
-        
+
         self.assertEqual(
             new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
         )
         self.assertEqual(
             new_order["customer_id"], test_order.customer_id, "Customer id does not match"
         )
-        
+
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -146,7 +140,6 @@ class order(TestCase):
         self.assertEqual(
             new_order["customer_id"], test_order.customer_id, "Customer id does not match"
         )
-
 
     def test_update_order(self):
         """Update an existing order"""
@@ -184,6 +177,10 @@ class order(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_order_items(self):
+        """Update order items"""
+        test_order = self._create_order(1)[0]
+
     # disabling this one until I can figure out what's going on - ELF
 
     # def query_order_list_by_customer(self):
@@ -204,9 +201,9 @@ class order(TestCase):
     #     for order in data:
     #         self.assertEqual(order["customer_id"], test_id_customer)
 
-######################################################################
-# Test Error Handlers
-######################################################################
+    ######################################################################
+    # Test Error Handlers
+    ######################################################################
 
     def test_400_bad_request(self):
         """ Test a Bad Request error from Find By Name """
@@ -221,7 +218,6 @@ class order(TestCase):
         resp = self.app.get('/order/876xx')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    
     def test_method_415_unsupported_media_type(self):
         test_order = OrderFactory()
         resp = self.app.post(
@@ -232,9 +228,9 @@ class order(TestCase):
     # def test_method_500_internal_server_error(self):
     #     test_order_1 = OrderFactory()
     #     test_order_1.customer_id = 'xxxxxx'
-        
+
     #     resp = self.app.post(
     #         BASE_URL, json=test_order_1.serialize(), content_type=CONTENT_TYPE_JSON
     #     )
-        
+
     #     self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
