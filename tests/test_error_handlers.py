@@ -2,7 +2,6 @@ import unittest
 
 import service.error_handlers
 
-
 # class TestErrorHandlers(unittest.TestCase):
 
 #     def test_request_validation_error(self):

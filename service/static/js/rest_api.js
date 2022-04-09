@@ -11,7 +11,7 @@ $(function () {
 
         let ts = Date.parse(res.date_order);
         let nd = new Date(ts);
-        let month = ["01","02","03","04","05","06","07","08","09","10","11","12"];
+        let month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 
         let date_order = nd.getFullYear() + '-' + month[nd.getMonth()] + '-' + (nd.getDate()).toString().padStart(2, "0");
 
@@ -46,7 +46,7 @@ $(function () {
         };
 
         $("#flash_message").empty();
-        
+
         let ajax = $.ajax({
             type: "POST",
             url: "/orders",
@@ -54,12 +54,12 @@ $(function () {
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
     });
@@ -84,18 +84,18 @@ $(function () {
         $("#flash_message").empty();
 
         let ajax = $.ajax({
-                type: "PUT",
-                url: `/orders/${order_id}`,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+            type: "PUT",
+            url: `/orders/${order_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 
@@ -118,13 +118,13 @@ $(function () {
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
@@ -148,12 +148,12 @@ $(function () {
             data: '',
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_form_data()
             flash_message("Order has been Deleted!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
@@ -191,7 +191,7 @@ $(function () {
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             $("#search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
@@ -201,9 +201,9 @@ $(function () {
             table += '<th class="col-md-2">Date</th>'
             table += '</tr></thead><tbody>'
             let firstOrder = "";
-            for(let i = 0; i < res.length; i++) {
+            for (let i = 0; i < res.length; i++) {
                 let order = res[i];
-                table +=  `<tr id="row_${i}"><td>${order.id}</td><td>${order.customer_id}</td><td>${order.date_order}</td></tr>`;
+                table += `<tr id="row_${i}"><td>${order.id}</td><td>${order.customer_id}</td><td>${order.date_order}</td></tr>`;
                 if (i == 0) {
                     firstOrder = order;
                 }
@@ -219,7 +219,7 @@ $(function () {
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 

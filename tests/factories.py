@@ -26,6 +26,7 @@ from factory.fuzzy import FuzzyDateTime
 from factory.fuzzy import FuzzyInteger
 from factory.fuzzy import FuzzyFloat
 
+
 class OrderFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
 
@@ -35,6 +36,7 @@ class OrderFactory(factory.Factory):
     id = factory.Sequence(lambda n: n)
     date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
     customer_id = FuzzyInteger(1, 999)
+
 
 class OrderItemFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
@@ -48,8 +50,9 @@ class OrderItemFactory(factory.Factory):
     product_quantity = FuzzyInteger(1, 10)
     product_price = FuzzyFloat(0.5, 10.0)
 
+
 class OrderWithItemsFactory(OrderFactory):
-    
+
     @factory.post_generation
     def items(obj, create, extracted, **kwargs):
         """
