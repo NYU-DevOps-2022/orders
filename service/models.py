@@ -3,19 +3,18 @@ Models for orders
 
 All of the models are stored in this module
 """
-from curses import has_key
-import json
-import logging
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 
 from . import app
+
 # logger = logging.getLogger("flask.app")
 logger = app.logger
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
+
 
 def init_db(app):
     """Initialize the SQLAlchemy app"""
@@ -40,22 +39,22 @@ class Order(db.Model):
     customer_id = db.Column(db.Integer, nullable=False)
 
     # Relationship
-    items = db.relationship("OrderItem", back_populates="order", cascade="all, delete",passive_deletes=True)
+    items = db.relationship("OrderItem", back_populates="order", cascade="all, delete", passive_deletes=True)
 
     def __repr__(self):
         return f"<order id=[{self.id}]>"
 
     def create(self):
         """
-        Creates a order_header to the database
+        Creates an order_header in the database
         """
         logger.info("Creating %s", self.id)
-        #todo: Change id to id
+        # todo: Change id to id
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
-        if hasattr(self,'item_list'):
+        if hasattr(self, 'item_list'):
             for item in self.item_list:
                 order_item = OrderItem()
                 item['order_id'] = self.id
@@ -64,7 +63,7 @@ class Order(db.Model):
 
     def update(self):
         """
-        Updates an Order to the database
+        Updates an Order in the database
         """
         logger.info("Saving %s", self.id)
         if not self.id:
@@ -83,7 +82,7 @@ class Order(db.Model):
             "id": self.id,
             "date_order": self.date_order,
             "customer_id": self.customer_id,
-            "items" : [item.serialize() for item in self.items]
+            "items": [item.serialize() for item in self.items]
         }
 
     def deserialize(self, data):
@@ -150,9 +149,10 @@ class Order(db.Model):
         # logger.info(f"Processing name query for {date_order} ...")
         return cls.query.filter(cls.date_order == date_order)
 
+
 class OrderItem(db.Model):
     """
-    Class that represents a <your resource model name>
+    Class that represents an Order Item
     """
     app = None
 
@@ -165,7 +165,7 @@ class OrderItem(db.Model):
 
     # Relationship
     order = db.relationship("Order", back_populates="items")
-    
+
     def __repr__(self):
         return f"<id=[{self.id}]>"
 
@@ -175,10 +175,9 @@ class OrderItem(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
     def update(self):
         """
-        Updates an orderitem to the database
+        Updates an orderitem in the database
         """
         logger.info("Saving %s", self.id)
         if not self.id:
