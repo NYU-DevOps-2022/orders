@@ -205,8 +205,9 @@ def update_order_items(id):
     order = check_valid_order(id)
     order.deserialize(request.get_json())
     order.id = id
-    order.update()
-    app.logger.info("Order with ID [%s] updated.", order.id)
+    for item in order.items:
+        item.update()
+    app.logger.info("Order items for order with ID [%s] updated.", order.id)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
