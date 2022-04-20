@@ -15,16 +15,14 @@ PUT /orders/{id} - updates a Order record in the database
 DELETE /orders/{id} - deletes a Order record in the database
 """
 
-from asyncio.log import logger
+import sys
+import secrets
 import logging
-from flask import jsonify, request, url_for, make_response, abort
-from werkzeug.exceptions import NotFound
-
-from service.models import Order
-from . import status  # HTTP Status Codes
-
-# Import Flask application
-from . import app
+from functools import wraps
+from flask import jsonify, request, url_for, make_response, render_template
+from flask_restx import Api, Resource, fields, reqparse, inputs
+from service.models import Pet, Gender, DataValidationError, DatabaseConnectionError
+from . import app, status    # HTTP Status Codes
 
 
 ######################################################################
@@ -44,6 +42,19 @@ def index():
     """Base URL for our service"""
     return app.send_static_file("index.html")
 
+######################################################################
+# Configure Swagger before initializing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Order Demo REST API Service',
+          description='This is a sample server Order store server.',
+          default='orders',
+          default_label='Order shop operations',
+          doc='/apidocs', # default also could use doc='/apidocs/'
+          #authorizations=authorizations,
+          prefix='/api'
+         )
 
 # ######################################################################
 # # GET INDEX
@@ -61,15 +72,101 @@ def index():
 #         status.HTTP_200_OK,
 #     )
 
+# Define the model so that the docs reflect what can be sent
+create_model = api.model('Order_Items', {
+    'Order_Items_id': fields.String(readOnly=True,
+                          description='The id of the order_items'),
+    'Product_Id': fields.String(required=True,
+                              description='Name of the product'),
+    'Product_Price': fields.String(required=True,
+                                description='Product Price'),
+    'Product_Quantity': fields.String(required=True,
+                                description='Product Quantity')
+})
 
+order_model = api.inherit(
+    'OrderModel', 
+    create_model,
+    {
+    'id': fields.String(readOnly=True,
+                            description='The unique id assigned internally by service')
+    'Date_Order': fields.String(required=True,
+                                description='Date Order')
+    'Customer_id': fields.String(required=True,
+                                description='Customer id')                    
+    }
+)
+
+# query string arguments
+Order_Items_args = reqparse.RequestParser()
+Order_Items_args.add_argument('Order_Items_id', type=str, required=False, help='List Order Items by ID')
+Order_Items_args.add_argument('Product_Id', type=str, required=False, help='List Order Items by Product_Id')
+Order_Items_args.add_argument('Product_Price', type=inputs.boolean, required=False, help='List Order Items price')
+
+######################################################################
+# Special Error Handlers
+######################################################################
+@api.errorhandler(DataValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    message = str(error)
+    app.logger.error(message)
+    return {
+        'status_code': status.HTTP_400_BAD_REQUEST,
+        'error': 'Bad Request',
+        'message': message
+    }, status.HTTP_400_BAD_REQUEST
+
+@api.errorhandler(DatabaseConnectionError)
+def database_connection_error(error):
+    """ Handles Database Errors from connection attempts """
+    message = str(error)
+    app.logger.critical(message)
+    return {
+        'status_code': status.HTTP_503_SERVICE_UNAVAILABLE,
+        'error': 'Service Unavailable',
+        'message': message
+    }, status.HTTP_503_SERVICE_UNAVAILABLE
+
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """ Helper function used when testing API keys """
+    return secrets.token_hex(16)
+
+
+######################################################################
+#  PATH: /orders/{id}
+######################################################################
+@api.route('/orders/<order_id>')
+@api.param('order_id', 'The Order identifier')
+class OrderResource(Resource):
+    """
+    OrderResource class
+
+    Allows the manipulation of a single Order
+    GET /orders/{id} - Returns a Order with the id
+    PUT /orders/{id} - Update an Order with the id
+    DELETE /orders/{id} -  Deletes an Order with the id
+    """
+######################################################################
+#  PATH: /orders
+######################################################################
+@api.route('/orders/<order_id>')
+@api.param('order_id', 'The Order identifier')
+class OrderResource(Resource):
+    """ Handles all interactions with collections of Pets """
 ######################################################################
 # LIST ALL ORDERS
 ######################################################################
-@app.route("/orders", methods=["GET"])
-def list_orders():
+ @api.doc('list_orders')
+    @api.expect(order_args, validate=True)
+    @api.marshal_list_with(order_model)
+    def get(self):
     """Returns all of the Orders"""
     app.logger.info("Request for order list")
-
     orders = []
     customer = request.args.get("customer")
     date_order = request.args.get("date_order")
@@ -88,14 +185,14 @@ def list_orders():
     app.logger.info("Returning %d orders", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
 
-
-######################################################################
-# GET AN ORDER INFO
-######################################################################
-
-@app.route("/orders/<int:id>", methods=["GET"])
-def get_order(id):
-    """
+ #------------------------------------------------------------------
+    # RETRIEVE AN ORDER
+    #------------------------------------------------------------------
+ @api.doc('get_orders')
+ @api.response(404, 'Order not found')
+ @api.marshal_with(order_model)
+ def get(self, order_id):
+        """
     Get info of an Order
     This endpoint will return an Order information based the id specified in the path
     """
@@ -106,7 +203,8 @@ def get_order(id):
     #     raise NotFound(f"Order with id '{id}' was not found.")
 
     app.logger.info("Returning order: %s", order.id)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    return order.serialize(), (status.HTTP_200_OK)
+
 
 
 ######################################################################
@@ -155,9 +253,14 @@ def create_orders():
 #  UPDATE AN Order
 ######################################################################
 
-@app.route("/orders/<int:id>", methods=["PUT"])
-def update_orders(id):
-    """     
+    @api.doc('update_orders') #security='apikey'
+    @api.response(404, 'Order not found')
+    @api.response(400, 'The posted Order data was not valid')
+    @api.expect(create_model)
+    @api.marshal_with(create_model)
+    #@token_required
+    def put(self, order_id):
+            """     
     Update an order  
     """
     app.logger.info("Request to update pet with id: %s", id)
@@ -167,15 +270,17 @@ def update_orders(id):
     order.id = id
     order.update()
     app.logger.info("Order with ID [%s] updated.", order.id)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    return order.serialize(), status.HTTP_200_OK)
 
 
 ######################################################################
 # DELETE AN ORDER
 ######################################################################
 
-@app.route("/orders/<int:id>", methods=["DELETE"])
-def delete_orders(id):
+@api.doc('delete_orders')
+@api.response(204, 'Order deleted')
+   # @token_required
+def delete(self, order_id):
     """
     Delete an Order
     This endpoint will delete an Order based the id specified in the path
@@ -190,16 +295,22 @@ def delete_orders(id):
         order.delete()
 
     app.logger.info("Order with ID [%s] delete complete.", id)
-    return make_response("", status.HTTP_204_NO_CONTENT)
+    return '', status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
 #  UPDATE Order items
 ######################################################################
 
-
-@app.route("/orders/<int:id>/items", methods=["PUT"])
-def update_order_items(id):
+ @api.doc('update_orders')
+ @api.response(404, 'Order not found')
+    @api.response(400, 'The posted Order data was not valid')
+    @api.expect(order_model)
+    @api.marshal_with(order_model)
+    #@token_required
+    def put(self, id):
+        """
+       
     app.logger.info("Request to update order items with id: %s", id)
     check_content_type("application/json")
     order = check_valid_order(id)
@@ -208,7 +319,7 @@ def update_order_items(id):
     for item in order.items:
         item.update()
     app.logger.info("Order items for order with ID [%s] updated.", order.id)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
