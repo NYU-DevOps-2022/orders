@@ -4,7 +4,7 @@ applications:
 - name: orders
   path: .
   instances: 2
-  memory: 512M
+  memory: 256M
   # routes:
   # - route: lab-bluemix-cf.us-south.cf.appdomain.cloud
   # - route: devops-orders.us-south.cf.appdomain.cloud
