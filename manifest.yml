@@ -5,33 +5,32 @@ applications:
   path: .
   instances: 2
   memory: 512M
-  routes:
+  # routes:
   # - route: lab-bluemix-cf.us-south.cf.appdomain.cloud
-  - route: devops-orders.us-south.cf.appdomain.cloud
+  # - route: devops-orders.us-south.cf.appdomain.cloud
   disk_quota: 1024M
   buildpacks: 
   - python_buildpack
   timeout: 180
   services:
-  # - Cloudant
   - ElephantSQL
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false
 
-- name: orders-prod
-  path: .
-  instances: 2
-  memory: 512M
-  routes:
-  - route: orders-prod.us-south.cf.appdomain.cloud
-  disk_quota: 1024M
-  buildpacks: 
-  - python_buildpack
-  timeout: 180
-  services:
-  # - Cloudant
-  - ElephantSQL_PROD
-  env:
-    FLASK_APP : service:app
-    FLASK_DEBUG : false
+# - name: orders-prod
+#   path: .
+#   instances: 2
+#   memory: 512M
+#   routes:
+#   - route: prod-orders.us-south.cf.appdomain.cloud
+#   disk_quota: 1024M
+#   buildpacks: 
+#   - python_buildpack
+#   timeout: 180
+#   services:
+#   # - Cloudant
+#   - ElephantSQL_PROD
+#   env:
+#     FLASK_APP : service:app
+#     FLASK_DEBUG : false
