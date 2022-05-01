@@ -18,3 +18,10 @@
 First run `honcho run`
 
 Then in a new terminal window run `nosetests` for unit tests or `behave` for Behave test.
+
+
+## Cloud URLs:
+* [Dev - Frontend](https://devops-orders.us-south.cf.appdomain.cloud)
+* [Dev - Swagger Doc](https://devops-orders.us-south.cf.appdomain.cloud/apidocs)
+* [Prod - Frontend](https://prod-orders.us-south.cf.appdomain.cloud)
+* [Prod - Swagger Doc](https://prod-orders.us-south.cf.appdomain.cloud/apidocs)
