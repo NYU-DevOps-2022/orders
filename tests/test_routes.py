@@ -11,7 +11,7 @@ from unittest import TestCase
 
 from service import app, status  # HTTP Status Codes
 from service.models import db, init_db
-from .factories import OrderFactory
+from tests.factories import OrderFactory, OrderWithItemsFactory
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -123,10 +123,11 @@ class OrderTests(TestCase):
         new_order = resp.get_json()
 
         self.assertEqual(
-            new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
+            # new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
+            new_order["date_order"], test_order.date_order.strftime('%Y-%m-%d'), "Order date do not match"
         )
         self.assertEqual(
-            new_order["customer_id"], test_order.customer_id, "Customer id does not match"
+            new_order["customer_id"], str(test_order.customer_id), "Customer id does not match"
         )
 
         # Check that the location header was correct
@@ -135,10 +136,11 @@ class OrderTests(TestCase):
         new_order = resp.get_json()
 
         self.assertEqual(
-            new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
+            # new_order["date_order"], test_order.date_order.strftime('%a, %d %b %Y %H:%M:%S GMT'), "Order date do not match"
+            new_order["date_order"], test_order.date_order.strftime('%Y-%m-%d'), "Order date do not match"
         )
         self.assertEqual(
-            new_order["customer_id"], test_order.customer_id, "Customer id does not match"
+            new_order["customer_id"], str(test_order.customer_id), "Customer id does not match"
         )
 
     def test_update_order(self):
@@ -161,7 +163,7 @@ class OrderTests(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_order = resp.get_json()
-        self.assertEqual(updated_order["customer_id"], 99999)
+        self.assertEqual(updated_order["customer_id"], '99999')
 
     def test_delete_order(self):
         """Delete an order"""
@@ -198,6 +200,31 @@ class OrderTests(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_order = resp.get_json()
         self.assertEqual(updated_order["items"], [])
+
+
+    def test_get_order_items(self):
+        test_order = OrderWithItemsFactory(items=4)
+        resp = self.app.post(
+            BASE_URL, json=test_order.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(test_order.items), 4)
+        
+        self.assertNotEqual(test_order.items[0].product_id, 123)
+        
+        origin_order_items = test_order.items
+        
+        test_order.items[0].product_quantity = test_order.items[0].product_quantity + 5
+        
+        resp = self.app.put(
+            BASE_URL + '/' + str(test_order.id) , json=test_order.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        logging.debug(resp)
+        update_order = resp.get_json()
+        logging.info(update_order)
+        self.assertEqual(update_order.items[0].product_quantity, origin_order_items[0].product_quantity)
+
+
 
     # disabling this one until I can figure out what's going on - ELF
 

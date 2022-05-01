@@ -4,6 +4,7 @@ Models for orders
 All of the models are stored in this module
 """
 from datetime import datetime
+import logging
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -47,13 +48,14 @@ class Order(db.Model):
     def create(self):
         """
         Creates an order_header in the database
+        orders = Order.all()
         """
-        logger.info("Creating %s", self.id)
+        logger.info("Creating %s", self)
         # todo: Change id to id
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
-
+        app.logger.debug("Creating order")
         if hasattr(self, 'item_list'):
             for item in self.item_list:
                 order_item = OrderItem()
@@ -96,7 +98,9 @@ class Order(db.Model):
             self.date_order = data["date_order"]
             self.customer_id = data["customer_id"]
 
-            if hasattr(data, "item_list"):
+            if "item_list" in data:
+                # app.logger.debug("In deserilized")
+                # app.logger.debug(data["item_list"])
                 self.item_list = data["item_list"]
 
         except KeyError as error:
