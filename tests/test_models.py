@@ -35,7 +35,7 @@ from werkzeug.exceptions import NotFound
 
 from service import app
 from service.models import Order, OrderItem, db, DataValidationError
-from .factories import OrderFactory, OrderItemFactory, OrderWithItemsFactory
+from tests.factories import OrderFactory, OrderItemFactory, OrderWithItemsFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"

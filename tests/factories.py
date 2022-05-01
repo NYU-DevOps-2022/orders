@@ -26,17 +26,22 @@ from factory.fuzzy import FuzzyDateTime
 from factory.fuzzy import FuzzyInteger
 from factory.fuzzy import FuzzyFloat
 
+starting_seq_num = 1
 
 class OrderFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
 
     class Meta:
         model = Order
-
+    factory
     id = factory.Sequence(lambda n: n)
     date_order = FuzzyDateTime(datetime(2020, 1, 1, tzinfo=timezone.utc))
     customer_id = FuzzyInteger(1, 999)
 
+    @classmethod
+    def _setup_next_sequence(cls):      
+        # Instead of defaulting to starting with 0, start with starting_seq_num.
+        return starting_seq_num
 
 class OrderItemFactory(factory.Factory):
     """Creates fake orders that you don't have to feed"""
