@@ -114,7 +114,7 @@ $(function () {
         let ajax = $.ajax({
             type: "GET",
             url: `/orders/${order_id}`,
-            contentType: "application/json",
+            // contentType: "application/json",
             data: ''
         })
 
@@ -180,14 +180,17 @@ $(function () {
         let queryString = ""
 
         if (customer) {
-            queryString += 'customer=' + customer
+            queryString += 'customer_id=' + customer
+        } else if (date) {
+            queryString += 'date_order=' + date
         }
+        console.log(date);
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "GET",
             url: `/orders?${queryString}`,
-            contentType: "application/json",
+            // contentType: "application/json",
             data: ''
         })
 

@@ -32,7 +32,8 @@ def step_impl(context):
     """ Delete all Order and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the orders and delete them one by one
-    context.resp = requests.get(context.base_url + '/orders', headers=headers)
+    context.resp = requests.get(context.base_url + '/orders')
+    # context.resp = requests.get(context.base_url + '/orders', headers=headers)
     expect(context.resp.status_code).to_equal(200)
     for order in context.resp.json():
         context.resp = requests.delete(context.base_url + '/orders/' + str(order["id"]), headers=headers)
