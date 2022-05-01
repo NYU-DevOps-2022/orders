@@ -110,18 +110,18 @@ order_args.add_argument('date_order', type=str, required=False, help='The date w
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'X-Api-Key' in request.headers:
-            token = request.headers['X-Api-Key']
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if 'X-Api-Key' in request.headers:
+#             token = request.headers['X-Api-Key']
 
-        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
-            return f(*args, **kwargs)
-        else:
-            return {'message': 'Invalid or missing token'}, 401
-    return decorated
+#         if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+#             return f(*args, **kwargs)
+#         else:
+#             return {'message': 'Invalid or missing token'}, 401
+#     return decorated
 
 ######################################################################
 # Function to generate a random API key (good for testing)
@@ -314,6 +314,7 @@ class OrderCollection(Resource):
 class OrderItemResource(Resource):
     # @app.route("/orders/<int:id>/items", methods=["PUT"])
     @api.doc('get_order_items')
+    @api.marshal_with(item_model)
     @api.response(404, 'Order not found')
     def get(self, id):
         app.logger.info("Request to see order items with id: %s", id)
@@ -326,7 +327,8 @@ class OrderItemResource(Resource):
         #     item.update()
         
         # app.logger.info("Order items for order with ID [%s] updated.", order.id)
-        return order.items.serialize(), status.HTTP_200_OK
+        return [item.serialize() for item in order.items], status.HTTP_200_OK
+        # return order.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -346,37 +348,13 @@ def init_db():
     Order.init_db(app)
 
 
-def check_content_type(media_type):
-    """Checks that the media type is correct"""
-    content_type = request.headers.get("Content-Type")
-    if content_type and content_type == media_type:
-        return
-    app.logger.error("Invalid Content-Type: %s", content_type)
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {media_type}",
-    )
-
-@app.route("/orders-old", methods=["GET"])
-def list_orders():
-    """Returns all of the Orders"""
-    app.logger.info("Request for order list")
-
-    orders = []
-    customer = request.args.get("customer")
-    date_order = request.args.get("date_order")
-
-    if customer:
-        orders = Order.find_by_customer(customer)
-        # logger.info("Search order by customer id: %d", customer)
-        if orders.count() == 0:
-            abort(status.HTTP_400_BAD_REQUEST)
-    if date_order:
-        orders = Order.find_by_date_order(date_order)
-    else:
-        orders = Order.all()
-        # orders = Order.find(25)
-
-    results = [order.serialize() for order in orders]
-    app.logger.info("Returning %d orders", len(results))
-    return make_response(jsonify(results), status.HTTP_200_OK)
+# def check_content_type(media_type):
+#     """Checks that the media type is correct"""
+#     content_type = request.headers.get("Content-Type")
+#     if content_type and content_type == media_type:
+#         return
+#     app.logger.error("Invalid Content-Type: %s", content_type)
+#     abort(
+#         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+#         f"Content-Type must be {media_type}",
+#     )

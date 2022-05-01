@@ -7,6 +7,8 @@ from datetime import datetime
 import logging
 
 from flask_sqlalchemy import SQLAlchemy
+# from SQLAlchemy import func
+from sqlalchemy import and_, func
 
 from . import app
 
@@ -72,6 +74,16 @@ class Order(db.Model):
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
+        for item in self.items:
+            item.delete()
+
+        if hasattr(self, 'item_list'):
+            for item in self.item_list:
+                order_item = OrderItem()
+                item['order_id'] = self.id
+                order_item.deserialize(item)
+                order_item.create()
+
     def delete(self):
         """ Removes an order_header from the data store """
         logger.info("Deleting %s", self.id)
@@ -84,7 +96,8 @@ class Order(db.Model):
             "id": self.id,
             "date_order": self.date_order,
             "customer_id": self.customer_id,
-            "items": [item.serialize() for item in self.items]
+            "items": [item.serialize() for item in self.items],
+            "item_list": [item.serialize() for item in self.items]
         }
 
     def deserialize(self, data):
@@ -151,7 +164,7 @@ class Order(db.Model):
     def find_by_date_order(cls, date_order):
         """ Returns all order_header with the given date order """
         # logger.info(f"Processing name query for {date_order} ...")
-        return cls.query.filter(cls.date_order == date_order)
+        return cls.query.filter(func.date(cls.date_order) == date_order)
 
 
 class OrderItem(db.Model):
