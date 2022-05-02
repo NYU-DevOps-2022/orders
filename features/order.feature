@@ -58,6 +58,7 @@ Scenario: Update a Order
     And I press the "Clear" button
     And I paste the "Id" field
     And I press the "Retrieve" button
+    Then I should see the message "Success"
     Then I should see "999999" in the "Customer" field
     When I press the "Clear" button
     And I press the "Search" button
