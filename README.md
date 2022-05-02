@@ -25,3 +25,14 @@ Then in a new terminal window run `nosetests` for unit tests or `behave` for Beh
 * [Dev - Swagger Doc](https://devops-orders.us-south.cf.appdomain.cloud/apidocs)
 * [Prod - Frontend](https://prod-orders.us-south.cf.appdomain.cloud)
 * [Prod - Swagger Doc](https://prod-orders.us-south.cf.appdomain.cloud/apidocs)
+
+## IBM Cloud Commands
+
+```
+ibmcloud login --apikey @~/.bluemix/apikey.json -r us-south
+ibmcloud target -o {org_name} -s {environment}
+ibmcloud cf logs {app_name} --recent
+ibmcloud cf apps
+ibmcloud cf services
+
+```
