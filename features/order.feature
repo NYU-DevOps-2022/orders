@@ -30,7 +30,6 @@ Scenario: Create an Order
     When I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see "111" in the "Customer" field
-    # And I should see "04/22/2021" in the "Date" field
 
 
 
@@ -63,4 +62,4 @@ Scenario: Update a Order
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
-    Then I should not see "34523" in the results
+    Then I should not see "999" in the results
