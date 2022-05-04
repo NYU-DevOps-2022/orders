@@ -88,7 +88,7 @@ create_model = api.model('Order', {
                           description='The date when the order was placed'),
     'customer_id': fields.String(required=True,
                               description='The id of the customer for this order'),
-    'items': fields.List(fields.Nested(item_model))
+    'item_list': fields.List(fields.Nested(create_item_model))
 })
 
 order_model = api.inherit(
