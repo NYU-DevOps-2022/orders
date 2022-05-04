@@ -34,5 +34,6 @@ ibmcloud target -o {org_name} -s {environment}
 ibmcloud cf logs {app_name} --recent
 ibmcloud cf apps
 ibmcloud cf services
+ibmcloud cf push hostname=xxxx
 
 ```
