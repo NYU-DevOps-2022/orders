@@ -29,7 +29,8 @@ Scenario: Create an Order
     And the "Date" field should be empty
     When I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see "111" in the "Customer" field
+    Then I should see the message "Success"
+    And I should see "111" in the "Customer" field
 
 
 

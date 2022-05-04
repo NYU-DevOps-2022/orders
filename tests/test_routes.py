@@ -5,6 +5,7 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+from curses import has_key
 import logging
 import os
 from unittest import TestCase
@@ -189,17 +190,22 @@ class OrderTests(TestCase):
         self.assertEqual(len(test_order.items), 4)
         
         order = resp.get_json()
-
-        origin_first_item_quantity = order['items'][0]['product_quantity']
-        
-        order['items'][0]['product_quantity'] = origin_first_item_quantity + 5
-        order['item_list'] = order['items']
+        origin_first_item_quantity=0
+        if hasattr(order, "item_list"):
+            origin_first_item_quantity = order['items'][0]['product_quantity']
+            order['items'] = order['item_list']
+            order['items'][0]['product_quantity'] = origin_first_item_quantity + 5
+        # order['item_list'] = order['items']
         
         resp = self.app.put(
             BASE_URL + '/' + str(order['id']) , json=order, content_type=CONTENT_TYPE_JSON
         )
         logging.debug(resp)
         update_order = resp.get_json()
+        if hasattr(update_order, "item_list"):
+            update_order['items'] = update_order['item_list']
+        update_order['items'] = update_order['item_list']
+        
         logging.info(update_order)
         self.assertNotEqual(update_order['items'][0]['product_quantity'], origin_first_item_quantity)
 
