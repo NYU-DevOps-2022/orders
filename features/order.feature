@@ -51,7 +51,7 @@ Scenario: Update a Order
     And I set the "Customer" to "34523"
     And I press the "Search" button
     Then I should see "34523" in the "Customer" field
-    When I set the "Customer" to "999"
+    When I change "Customer" to "999"
     And I press the "Update" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -62,4 +62,5 @@ Scenario: Update a Order
     Then I should see "999" in the "Customer" field
     When I press the "Clear" button
     And I press the "Search" button
+    Then I should see the message "Success"
     Then I should not see "34523" in the results

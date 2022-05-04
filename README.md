@@ -15,7 +15,7 @@
 
 ## Tests
 
-First run `honcho run`
+First run `honcho start`
 
 Then in a new terminal window run `nosetests` for unit tests or `behave` for Behave test.
 
