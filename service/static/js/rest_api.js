@@ -202,11 +202,20 @@ $(function () {
             table += '<th class="col-md-2">ID</th>'
             table += '<th class="col-md-2">Customer</th>'
             table += '<th class="col-md-2">Date</th>'
+            table += '<th class="col-md-2">Details</th>'
             table += '</tr></thead><tbody>'
             let firstOrder = "";
             for (let i = 0; i < res.length; i++) {
                 let order = res[i];
-                table += `<tr id="row_${i}"><td>${order.id}</td><td>${order.customer_id}</td><td>${order.date_order}</td></tr>`;
+                console.log(order)
+                details = '';
+                order.item_list.forEach(item => {
+                    details += 'product id: ' + item.product_id
+                            + '<br />product price: ' + item.product_price
+                            + '<br />product quantity: ' + item.product_quantity + '<hr />'
+                });
+
+                table += `<tr id="row_${i}"><td>${order.id}</td><td>${order.customer_id}</td><td>${order.date_order}</td><td>${details}</td></tr>`;
                 if (i == 0) {
                     firstOrder = order;
                 }
