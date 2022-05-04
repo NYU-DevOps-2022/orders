@@ -5,7 +5,20 @@ $(function () {
     // ****************************************
 
     // Updates the form with data from the response
-    function update_form_data(res) {
+    function update_form_order_data(res) {
+        $("#order_id").val(res.id);
+        $("#order_customer").val(res.customer_id);
+
+        let ts = Date.parse(res.date_order);
+        let nd = new Date(ts);
+        let month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+
+        let date_order = nd.getFullYear() + '-' + month[nd.getMonth()] + '-' + (nd.getDate()).toString().padStart(2, "0");
+
+        $("#order_date").val(date_order);
+    }
+
+    function update_form_item_details(res) {
         $("#order_id").val(res.id);
         $("#order_customer").val(res.customer_id);
 
@@ -55,7 +68,7 @@ $(function () {
         });
 
         ajax.done(function (res) {
-            update_form_data(res)
+            update_form_order_data(res)
             flash_message("Success")
         });
 
@@ -91,7 +104,7 @@ $(function () {
         })
 
         ajax.done(function (res) {
-            update_form_data(res)
+            update_form_order_data(res)
             flash_message("Success")
         });
 
@@ -120,7 +133,7 @@ $(function () {
 
         ajax.done(function (res) {
             //alert(res.toSource())
-            update_form_data(res)
+            update_form_order_data(res)
             flash_message("Success")
         });
 
@@ -216,13 +229,67 @@ $(function () {
 
             // copy the first result to the form
             if (firstOrder != "") {
-                update_form_data(firstOrder)
+                update_form_order_data(firstOrder)
             }
 
             flash_message("Success")
         });
 
         ajax.fail(function (res) {
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Retrieve order items
+    // ****************************************
+
+    //TODO: Test then hide/unhide tables.
+    $("#retrieve-btn").click(function () {
+
+        let order_id = $("#order_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/orders/${order_id}/items`,
+            // contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function (res) {
+            //alert(res.toSource())
+            $("#order_search_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-2">ID</th>'
+            table += '<th class="col-md-2">Customer</th>'
+            table += '<th class="col-md-2">Date</th>'
+            table += '</tr></thead><tbody>'
+            let firstItem = "";
+            for (let i = 0; i < res.length; i++) {
+                let item = res[i];
+                table += `<tr id="row_${i}"><td>${item.product_id}</td><td>${item.product_price}</td><td>${item.product_quantity}</td></tr>`;
+                if (i == 0) {
+                    firstItem = item;
+                }
+            }
+            table += '</tbody></table>';
+            $("#order_search_results").append(table);
+
+            // copy the first result to the form
+            if (firstItem != "") {
+                update_form_order_data(firstItem)
+            }
+
+            update_form_item_details(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function (res) {
+            clear_form_data()
             flash_message(res.responseJSON.message)
         });
 
